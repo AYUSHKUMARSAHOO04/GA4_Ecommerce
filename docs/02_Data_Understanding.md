@@ -193,7 +193,7 @@ Stated explicitly, per senior-analyst practice, rather than left implicit:
 4. **`debug_mode = 1` traffic is treated as test traffic** and excluded from production-grade metrics after validation confirms its presence and volume.
 5. **City/metro-level geographic cuts are descriptive only**, not decision-bearing, due to small sample sizes at that granularity.
 6. **No real advertising cost or CAC data exists in this schema.** Any "ROI" or "channel efficiency" language elsewhere in this project is directional and qualitative, never a literal cost-based calculation.
-7. **The Nov–Dec seasonal spike (Black Friday/Cyber Monday/Christmas) is called out explicitly** wherever raw trend lines are shown, to avoid presenting seasonal lift as organic growth.
+7. **The Nov-Dec seasonal spike (Black Friday/Cyber Monday/Christmas) is called out explicitly** wherever raw trend lines are shown, to avoid presenting seasonal lift as organic growth.
 8. **This is a sample, obfuscated dataset.** All findings are framed as directional and methodology-driven, never as literal claims about the real Google Merchandise Store's actual business performance.
 
 ---
