@@ -127,7 +127,7 @@ Only **one** of the four `value.*` sub-fields is ever populated per key, dependi
 | `debug_mode` | int_value | QA/test-traffic flag **filtered out** in production-grade queries |
 | `clean_event` | string_value | Internal GTM bookkeeping not business-relevant |
 
-### 4.2 `items` — the product-performance array
+### 4.2 `items` the product-performance array
 
 ~26-field STRUCT array (`item_id`, `item_name`, `item_category` through `category5`, `price_in_usd`, `quantity`, `item_revenue_in_usd`, `item_list_name/index`, `promotion_id/name`, etc.), empty `[]` on non-commerce events.
 
