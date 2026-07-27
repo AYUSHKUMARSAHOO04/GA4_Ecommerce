@@ -143,7 +143,7 @@ Only **one** of the four `value.*` sub-fields is ever populated per key, dependi
 
 ### 4.5 `traffic_source`
 
-`medium`, `source`, `name`. Always grouped as `medium + source` together, never `source` alone — `source = "google"` spans both free organic search and paid CPC, two entirely different economics; collapsing them is a real analytical error this project explicitly avoids.
+`medium`, `source`, `name`. Always grouped as `medium + source` together, never `source` alone `source = "google"` spans both free organic search and paid CPC, two entirely different economics; collapsing them is a real analytical error this project explicitly avoids.
 
 ### 4.6 `ecommerce`
 
