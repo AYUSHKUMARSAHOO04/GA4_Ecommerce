@@ -187,11 +187,11 @@ flowchart TD
 | Recommendation | Owner | Priority | Timeline |
 |---|---|---|---|
 | Data & Reporting Integrity Lockdown | Analytics/Engineering | Critical | Month 1 |
-| Homepage & Navigation Activation Redesign | Product | Critical | Month 2–3 |
-| Checkout Payment-Step UX Fix | Product/Engineering | Critical | Month 2–3 |
-| Past-Purchaser Loyalty Program | Marketing/CRM | High | Month 2–3 |
-| High-Value Tier Profiling & VIP Program | Analytics/Marketing | High | Month 1 (profile) → 6–12mo |
-| `(data deleted)` Segment Investigation | Analytics/Legal/Marketing | High | Month 1–3 |
+| Homepage & Navigation Activation Redesign | Product | Critical | Month 2-3 |
+| Checkout Payment-Step UX Fix | Product/Engineering | Critical | Month 2-3 |
+| Past-Purchaser Loyalty Program | Marketing/CRM | High | Month 2-3 |
+| High-Value Tier Profiling & VIP Program | Analytics/Marketing | High | Month 1 (profile) → 6-12mo |
+| `(data deleted)` Segment Investigation | Analytics/Legal/Marketing | High | Month 1-3 |
 
 Full roadmap, ROI/effort matrix, and department-level plan: **[`docs/07_Business_Recommendations.md`](docs/07_Business_Recommendations.md)**
 
