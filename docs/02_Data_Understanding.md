@@ -52,7 +52,7 @@ A single user's single session can generate 15-20+ rows `page_view`, `scroll`, `
 | select_promotion | 9,450 | Merchandising interaction |
 | purchase | 5,692 | Conversion |
 | click | 1,446 | Outbound/UI interaction |
-| view_item_list | 71 | Product discovery (rare — flagged for validation) |
+| view_item_list | 71 | Product discovery (rare, flagged for validation) |
 
 **Immediate observation worth flagging in the Executive Summary later:** `view_item` (386K) → `add_to_cart` (58.5K) → `purchase` (5.7K) is already a visibly steep funnel before any formal analysis roughly 15% view-to-cart and 10% cart-to-purchase at raw volume. Formal funnel construction (session-scoped, not just raw counts) happens in `06_Analysis.md`.
 
