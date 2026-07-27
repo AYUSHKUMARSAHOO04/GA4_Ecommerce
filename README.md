@@ -2,7 +2,7 @@
 
 # Google Merchandise Store Product Analytics Engagement
 
-### An end-to-end Product Analytics case study on GA4 BigQuery data — from raw event schema to validated SQL to executive strategy.
+### An end-to-end Product Analytics case study on GA4 BigQuery data from raw event schema to validated SQL to executive strategy.
 
 [![SQL](https://img.shields.io/badge/SQL-GoogleSQL%20%2F%20BigQuery-4285F4?style=flat-square&logo=googlebigquery&logoColor=white)](sql/)
 [![Google BigQuery](https://img.shields.io/badge/Data-GA4%20BigQuery%20Export-4285F4?style=flat-square&logo=google&logoColor=white)](docs/02_Data_Understanding.md)
