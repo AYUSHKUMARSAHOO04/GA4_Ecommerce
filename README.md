@@ -44,9 +44,9 @@ The Google Merchandise Store converts visitors and processes revenue normally bu
 |---|---|
 | Source | [`bigquery-public-data.ga4_obfuscated_sample_ecommerce`](https://console.cloud.google.com/bigquery?p=bigquery-public-data&d=ga4_obfuscated_sample_ecommerce) |
 | Grain | One row = one event (not a user, session, or transaction) |
-| Window | 92 days — Nov 1, 2020 to Jan 31, 2021 |
+| Window | 92 days : Nov 1, 2020 to Jan 31, 2021 |
 | Volume | 4,295,584 events · 270,154 users · 360,129 sessions |
-| Schema | Nested GA4 export — `event_params`, `items`, `device`, `geo`, `traffic_source`, `ecommerce` structs |
+| Schema | Nested GA4 export : `event_params`, `items`, `device`, `geo`, `traffic_source`, `ecommerce` structs |
 
 Full field-by-field documentation: **[`docs/02_Data_Understanding.md`](docs/02_Data_Understanding.md)**
 
