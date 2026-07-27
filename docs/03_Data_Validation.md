@@ -1,8 +1,8 @@
-# 03 — Data Validation
+# 03 : Data Validation
 
 All 20 validation queries from the Stage 3 suite were executed against
 `bigquery-public-data.ga4_obfuscated_sample_ecommerce`. This document records actual results,
-verdicts, and — critically — the methodology decisions those results forced us to make before
+verdicts, and critically the methodology decisions those results forced us to make before
 any KPI or funnel is built in later stages.
 
 ---
@@ -14,7 +14,7 @@ any KPI or funnel is built in later stages.
 |---|---|---|---|
 | 2020-11-01 | 2021-01-31 | 92 | 92 |
 
-**Verdict: ✅ PASS** — full 92-day window confirmed, no gaps.
+**Verdict: ✅ PASS** full 92-day window confirmed, no gaps.
 
 ### 1.2 Total Events Validation
 | total_events |
