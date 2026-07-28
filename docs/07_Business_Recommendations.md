@@ -45,7 +45,7 @@ This business does not need a turnaround. It needs three specific interventions 
 
 ---
 
-# 3. Quick Wins (0–30 Days)
+# 3. Quick Wins (0-30 Days)
 
 ### QW1 - Data & Reporting Integrity Lockdown
 **Business Problem:** Engagement-rate trend data has an undisclosed break at Dec 28, 2020 (confirmed tagging change); product-category reporting built on `item_id` silently misattributes revenue.
