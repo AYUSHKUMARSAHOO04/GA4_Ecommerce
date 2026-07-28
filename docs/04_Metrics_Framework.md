@@ -251,7 +251,7 @@ Metrics below reference these as **[R1]-[R5]** in their Caveats field.
 7. **Dimension compatibility:** Device, geo, traffic source
 8. **Refresh frequency:** Weekly
 9. **Interpretation:** Should be read alongside Engagement Rate (4.1) high rate + low time = many people engage briefly; low rate + high time = fewer people, but deeply.
-10. **Common mistakes:** Failing to apply the [R5] cap §6.5 found sessions with 10–19+ hours of single-event engagement time (background-tab artifacts) that will massively distort an uncapped average.
+10. **Common mistakes:** Failing to apply the [R5] cap §6.5 found sessions with 10-19+ hours of single-event engagement time (background-tab artifacts) that will massively distort an uncapped average.
 11. **Caveats from Stage 3:** [R5] mandatory this metric is invalid without the cap, per direct evidence in §6.5.
 12. **Example business decision supported:** Justifies content/page-depth investment if average engagement time is rising alongside stable engagement rate (deepening, not just maintaining, attention).
 
