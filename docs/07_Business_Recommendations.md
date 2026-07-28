@@ -49,6 +49,7 @@ This business does not need a turnaround. It needs three specific interventions 
 
 ### QW1 - Data & Reporting Integrity Lockdown
 **Business Problem:** Engagement-rate trend data has an undisclosed break at Dec 28, 2020 (confirmed tagging change); product-category reporting built on `item_id` silently misattributes revenue.
+
 **Supporting Evidence:** `06_Analysis.md` §4 (R6), §9 (R7).
 **Affected KPIs:** All engagement-time-based metrics (4.1, 4.2); all product/category revenue metrics (9.3, 9.4).
 **Expected Improvement:** Not a KPI lift a correctness fix. Prevents at least two materially wrong conclusions from reaching decision-makers.
