@@ -1,4 +1,4 @@
-# 05 — SQL Query Repository
+# 05 : SQL Query Repository
 
 Every query below implements a specific metric defined in `04_Metrics_Framework.md` and applies
 the validation-derived rules from `03_Data_Validation.md`:
@@ -8,16 +8,16 @@ the validation-derived rules from `03_Data_Validation.md`:
 - **[R3]** transaction-level revenue is sole source of truth; item-level revenue never reconciled to it
 - **[R4]** `view_item`/`begin_checkout` product-level cuts scoped to items-populated rows only
 - **[R5]** `engagement_time_msec` capped at 3,600,000ms before averaging
-- **[R6]** engagement-time-based metrics not comparable pre/post Dec 28, 2020 (confirmed tagging change — see §4.6)
+- **[R6]** engagement-time-based metrics not comparable pre/post Dec 28, 2020 (confirmed tagging change see §4.6)
 - **[R7]** `item_id` unreliable as a cross-event-type join key; use `item_name` for product-level joins between browsing and purchase events (see §9.5-9.6)
 
 Each query specifies: **Purpose** (which metric, §-reference) → **SQL** → **Business Interpretation** → **Expected Output**.
 
 ---
 
-## SECTION 1 — North Star Metric Queries
+## SECTION 1 - North Star Metric Queries
 
-### Query 1.1 — Weekly Transacting Users (WTU)
+### Query 1.1 - Weekly Transacting Users (WTU)
 
 **Purpose:** Implements Metric 1 (North Star). Applies [R1], [R2].
 
@@ -41,13 +41,13 @@ GROUP BY week_start
 ORDER BY week_start;
 ```
 
-**Business Interpretation:** This is the single number the VP Product and Head of Analytics track every Monday. A flat or declining trend despite stable/growing session volume (Query 2.1) signals a funnel problem, not a traffic problem — triggers a Stage 6 funnel deep-dive before any acquisition budget conversation.
+**Business Interpretation:** This is the single number the VP Product and Head of Analytics track every Monday. A flat or declining trend despite stable/growing session volume (Query 2.1) signals a funnel problem, not a traffic problem triggers a Stage 6 funnel deep-dive before any acquisition budget conversation.
 
-**Expected Output:** ~13 rows (one per week across the 92-day window), with a visible spike in the week(s) covering Black Friday/Cyber Monday and again around Christmas — must be annotated as seasonal, not organic growth, per the Stage 1 scope note.
+**Expected Output:** ~13 rows (one per week across the 92-day window), with a visible spike in the week(s) covering Black Friday/Cyber Monday and again around Christmas must be annotated as seasonal, not organic growth, per the Stage 1 scope note.
 
 ---
 
-### Query 1.2 — WTU vs. Total Sessions (North Star Efficiency Check)
+### Query 1.2 - WTU vs. Total Sessions (North Star Efficiency Check)
 
 **Purpose:** Cross-references Metric 1 against Metric 2.1 to test whether North Star growth is efficiency-driven or volume-driven.
 
@@ -86,15 +86,15 @@ JOIN weekly_wtu w USING (week_start)
 ORDER BY week_start;
 ```
 
-**Business Interpretation:** `wtu_per_100_sessions` is a normalized efficiency line — if it's flat while raw WTU rises, growth is purely traffic-driven (fragile); if it's rising, the product/funnel itself is converting better (durable). This is the chart that answers "are we actually getting better, or just bigger."
+**Business Interpretation:** `wtu_per_100_sessions` is a normalized efficiency line if it's flat while raw WTU rises, growth is purely traffic-driven (fragile); if it's rising, the product/funnel itself is converting better (durable). This is the chart that answers "are we actually getting better, or just bigger."
 
 **Expected Output:** ~13 weekly rows; expect `wtu_per_100_sessions` in the low single digits given the ~15%×~66%×~15% funnel stage rates implied by Stage 1 raw volumes.
 
 ---
 
-### Query 1.3 — North Star Cohort Split: New vs. Returning Contribution
+### Query 1.3 - North Star Cohort Split: New vs. Returning Contribution
 
-**Purpose:** Decomposes WTU by `ga_session_number` to show whether North Star growth comes from new or returning buyers — directly informs the Section 7/8 retention narrative.
+**Purpose:** Decomposes WTU by `ga_session_number` to show whether North Star growth comes from new or returning buyers directly informs the Section 7/8 retention narrative.
 
 ```sql
 WITH purchase_sessions AS (
@@ -117,15 +117,15 @@ GROUP BY week_start
 ORDER BY week_start;
 ```
 
-**Business Interpretation:** If `wtu_new` dominates every week, the business is functioning as a continuous acquisition funnel with little repeat-purchase contribution — reinforces the "brand engagement, not repeat-revenue engine" framing from `01_Project_Overview.md`, and is a direct input to the Repeat Purchase Rate finding (Metric 7.3) in Stage 6.
+**Business Interpretation:** If `wtu_new` dominates every week, the business is functioning as a continuous acquisition funnel with little repeat-purchase contribution reinforces the "brand engagement, not repeat-revenue engine" framing from `01_Project_Overview.md`, and is a direct input to the Repeat Purchase Rate finding (Metric 7.3) in Stage 6.
 
 **Expected Output:** Two time series across ~13 weeks; given the 1.33 sessions/user baseline (§2.2 validation), expect `wtu_new` to substantially outweigh `wtu_returning` in most weeks.
 
 ---
 
-## SECTION 2 — Acquisition Metrics Queries
+## SECTION 2 - Acquisition Metrics Queries
 
-### Query 2.1 — Daily & Weekly Sessions
+### Query 2.1 - Daily & Weekly Sessions
 
 **Purpose:** Implements Metric 2.1 (Sessions). Applies [R1].
 
@@ -147,13 +147,13 @@ GROUP BY event_dt
 ORDER BY event_dt;
 ```
 
-**Business Interpretation:** Base traffic trend line for the Executive Dashboard. Must be read with the Black Friday/Christmas seasonal annotation — a raw spike here is expected and should not be attributed to any specific Marketing action without a channel-level breakdown (Query 2.4).
+**Business Interpretation:** Base traffic trend line for the Executive Dashboard. Must be read with the Black Friday/Christmas seasonal annotation a raw spike here is expected and should not be attributed to any specific Marketing action without a channel-level breakdown (Query 2.4).
 
 **Expected Output:** 92 rows, one per day, ranging roughly from a few thousand to tens of thousands of sessions/day with a clear late-November and late-December peak.
 
 ---
 
-### Query 2.2 — New Users (First-Ever Session)
+### Query 2.2 - New Users (First-Ever Session)
 
 **Purpose:** Implements Metric 2.2. Applies [R1].
 
@@ -169,11 +169,11 @@ ORDER BY event_dt;
 
 **Business Interpretation:** Baseline acquisition-volume trend, cross-checked against `ga_session_number = 1` counts (Query 2.2b) as a data-consistency sanity check before being trusted for reporting.
 
-**Expected Output:** 92 daily rows; total across the window should be close to, but not necessarily exactly, the 270,154 unique users confirmed in §2.1 (some users' first_visit may fall outside the window if session-stitching edge cases exist — worth a reconciliation note, not an assumption of exact match).
+**Expected Output:** 92 daily rows; total across the window should be close to, but not necessarily exactly, the 270,154 unique users confirmed in §2.1 (some users' first_visit may fall outside the window if session-stitching edge cases exist worth a reconciliation note, not an assumption of exact match).
 
 ---
 
-### Query 2.2b — New Users Cross-Check (session_number method)
+### Query 2.2b - New Users Cross-Check (session_number method)
 
 **Purpose:** Validates Query 2.2 using an independent method (per the "cross-check before trusting" note in Metric 2.2's Common Mistakes).
 
@@ -188,13 +188,13 @@ GROUP BY event_dt
 ORDER BY event_dt;
 ```
 
-**Business Interpretation:** If this materially disagrees with Query 2.2's `first_visit`-based count, that's a genuine data-quality finding worth escalating (e.g., `first_visit` double-firing under debug_mode, consistent with the §2.5 entrance-doubling finding) — don't silently pick whichever number looks better.
+**Business Interpretation:** If this materially disagrees with Query 2.2's `first_visit`-based count, that's a genuine data-quality finding worth escalating (e.g., `first_visit` double-firing under debug_mode, consistent with the §2.5 entrance-doubling finding) don't silently pick whichever number looks better.
 
 **Expected Output:** Should closely track Query 2.2's daily totals; any divergence >5% on a given day warrants investigation before either number is published.
 
 ---
 
-### Query 2.3 — New User Rate (Weekly)
+### Query 2.3 - New User Rate (Weekly)
 
 **Purpose:** Implements Metric 2.3.
 
@@ -218,11 +218,11 @@ ORDER BY week_start;
 
 **Business Interpretation:** Per Metric 2.3's interpretation guidance, a healthy range is 60-80%; sustained readings near 100% flag a retention problem (Section 7), readings below 40% flag stalled acquisition (Section 2/10).
 
-**Expected Output:** ~13 weekly rows; given the low sessions-per-user baseline (1.33, §2.2), expect this rate to run on the higher end of or above the "healthy" range — itself a notable finding to surface in Stage 6.
+**Expected Output:** ~13 weekly rows; given the low sessions-per-user baseline (1.33, §2.2), expect this rate to run on the higher end of or above the "healthy" range itself a notable finding to surface in Stage 6.
 
 ---
 
-### Query 2.4 — Channel Session Mix (Medium + Source)
+### Query 2.4 - Channel Session Mix (Medium + Source)
 
 **Purpose:** Implements Metric 2.4. Correctly grouped by medium+source together, never source alone.
 
@@ -247,13 +247,13 @@ GROUP BY medium, source
 ORDER BY sessions DESC;
 ```
 
-**Business Interpretation:** This is the Marketing team's primary channel-mix view. Per §6.2, expect `(none)/direct` at roughly 23% of sessions — this must be labeled and reported as a real, legitimate channel segment, not folded into an "unknown" bucket or dropped from the chart.
+**Business Interpretation:** This is the Marketing team's primary channel-mix view. Per §6.2, expect `(none)/direct` at roughly 23% of sessions this must be labeled and reported as a real, legitimate channel segment, not folded into an "unknown" bucket or dropped from the chart.
 
 **Expected Output:** A ranked list of medium+source combinations (e.g., `organic/google`, `(none)/(direct)`, `cpc/google`, `referral/...`), summing to 100%.
 
 ---
 
-### Query 2.5 — Landing Page Entrance Rate (Deduplicated)
+### Query 2.5 - Landing Page Entrance Rate (Deduplicated)
 
 **Purpose:** Implements Metric 2.5, with the mandatory dedup fix identified in §2.5's validation finding (double-fired `entrances=1` events within a session).
 
@@ -285,15 +285,15 @@ ORDER BY entrance_sessions DESC
 LIMIT 25;
 ```
 
-**Business Interpretation:** Shows which pages act as the true front door. High concentration in 1-2 URLs (likely the homepage and a top campaign landing page) signals a resilience risk — Marketing/SEO should diversify entry points rather than depend on a single page.
+**Business Interpretation:** Shows which pages act as the true front door. High concentration in 1-2 URLs (likely the homepage and a top campaign landing page) signals a resilience risk Marketing/SEO should diversify entry points rather than depend on a single page.
 
 **Expected Output:** A ranked list of ~25 landing page URLs; expect the homepage (`https://shop.googlemerchandisestore.com/`) to dominate, consistent with the sample rows seen in Stage 1 discovery.
 
 ---
 
-### Query 2.6 — Channel Mix Trend (Weekly, Top 5 Channels)
+### Query 2.6 - Channel Mix Trend (Weekly, Top 5 Channels)
 
-**Purpose:** Extends Query 2.4 with a time dimension — supports the Marketing Channel dashboard's trend view, not just a point-in-time snapshot.
+**Purpose:** Extends Query 2.4 with a time dimension supports the Marketing Channel dashboard's trend view, not just a point-in-time snapshot.
 
 ```sql
 WITH sessions AS (
@@ -319,15 +319,15 @@ GROUP BY week_start, s.channel
 ORDER BY week_start, sessions DESC;
 ```
 
-**Business Interpretation:** Reveals whether a channel's share is stable, growing, or seasonal (e.g., paid channels often spike specifically around Black Friday while organic stays flat) — informs whether a channel's Black Friday performance is repeatable or a one-off seasonal artifact.
+**Business Interpretation:** Reveals whether a channel's share is stable, growing, or seasonal (e.g., paid channels often spike specifically around Black Friday while organic stays flat) informs whether a channel's Black Friday performance is repeatable or a one-off seasonal artifact.
 
 **Expected Output:** ~13 weeks × 5 channels = ~65 rows, suitable for a stacked-area or multi-line chart in the dashboard.
 
 ---
 
-### Query 2.7 — New vs. Returning Session Share by Channel
+### Query 2.7 - New vs. Returning Session Share by Channel
 
-**Purpose:** Implements Metric 10.3 using acquisition-stage data — included here because it's foundational to understanding *what kind* of traffic each channel brings before Section 10's deeper marketing analysis.
+**Purpose:** Implements Metric 10.3 using acquisition-stage data included here because it's foundational to understanding *what kind* of traffic each channel brings before Section 10's deeper marketing analysis.
 
 ```sql
 WITH sessions AS (
@@ -359,9 +359,9 @@ ORDER BY new_sessions + returning_sessions DESC;
 
 ---
 
-### Query 2.8 — Debug Traffic Share by Channel (Data Quality Cross-Check)
+### Query 2.8 - Debug Traffic Share by Channel (Data Quality Cross-Check)
 
-**Purpose:** Validation-adjacent query — tests whether the [R1] debug-traffic finding (85.74% overall, §6.4) is evenly distributed across channels or concentrated in one, which would change how channel comparisons should be interpreted.
+**Purpose:** Validation-adjacent query tests whether the [R1] debug-traffic finding (85.74% overall, §6.4) is evenly distributed across channels or concentrated in one, which would change how channel comparisons should be interpreted.
 
 ```sql
 WITH sessions AS (
@@ -384,23 +384,23 @@ GROUP BY medium
 ORDER BY total_sessions DESC;
 ```
 
-**Business Interpretation:** If `pct_debug` is roughly uniform (~85%) across all channels, the [R1] decision to leave debug traffic in stands without qualification for channel comparisons — relative channel performance is unaffected even though absolute volumes are inflated. If one channel shows a materially different debug share, every channel-level metric in Section 10 needs a footnote specific to that channel.
+**Business Interpretation:** If `pct_debug` is roughly uniform (~85%) across all channels, the [R1] decision to leave debug traffic in stands without qualification for channel comparisons relative channel performance is unaffected even though absolute volumes are inflated. If one channel shows a materially different debug share, every channel-level metric in Section 10 needs a footnote specific to that channel.
 
 **Expected Output:** A short table (one row per medium); the key check is whether `pct_debug` clusters tightly around 85% or diverges meaningfully by channel.
 
 ---
 
-**Batch 1 complete — 11 queries across Section 1 (North Star) and Section 2 (Acquisition).**
+**Batch 1 complete - 11 queries across Section 1 (North Star) and Section 2 (Acquisition).**
 
-**Batch 1 execution notes (from actual BigQuery results):** New User Rate is rising over time (82%→91%), a leading indicator of weak retention explored formally in Section 7. Peak traffic day was Dec 8, not the Nov 27–30 BF/CM window — needs a specific cause, not generic seasonality. Landing-page URLs need normalization (homepage fragments into 3 separate rows, 46% of entrances combined). `(data deleted)` is a real, distinct traffic_source value (6.17% of sessions, 96% returning) — open investigation item. Session-level debug-flag saturation (99.7%+) confirms and strengthens the [R1] decision.
+**Batch 1 execution notes (from actual BigQuery results):** New User Rate is rising over time (82%→91%), a leading indicator of weak retention explored formally in Section 7. Peak traffic day was Dec 8, not the Nov 27–30 BF/CM window needs a specific cause, not generic seasonality. Landing-page URLs need normalization (homepage fragments into 3 separate rows, 46% of entrances combined). `(data deleted)` is a real, distinct traffic_source value (6.17% of sessions, 96% returning) open investigation item. Session-level debug-flag saturation (99.7%+) confirms and strengthens the [R1] decision.
 
 ---
 
-## SECTION 2B — Follow-Up Queries (Prompted by Batch 1 Findings)
+## SECTION 2B - Follow-Up Queries (Prompted by Batch 1 Findings)
 
-### Query 2.9 — Normalized Landing Page Performance (Homepage Consolidation)
+### Query 2.9 - Normalized Landing Page Performance (Homepage Consolidation)
 
-**Purpose:** Corrects the URL-fragmentation issue discovered in Query 2.5 — three homepage domain variants must be treated as one page before any landing-page ranking is reported.
+**Purpose:** Corrects the URL-fragmentation issue discovered in Query 2.5 three homepage domain variants must be treated as one page before any landing-page ranking is reported.
 
 ```sql
 WITH raw_entrances AS (
@@ -439,13 +439,13 @@ ORDER BY entrance_sessions DESC
 LIMIT 20;
 ```
 
-**Business Interpretation:** Once consolidated, the true homepage share is likely close to the combined 45.96% found across the three variants in Query 2.5 — a much larger single-page concentration than any individual row suggested. This is the version of the metric that should actually go in front of Marketing/SEO, since the un-normalized version materially understates homepage dependency.
+**Business Interpretation:** Once consolidated, the true homepage share is likely close to the combined 45.96% found across the three variants in Query 2.5 a much larger single-page concentration than any individual row suggested. This is the version of the metric that should actually go in front of Marketing/SEO, since the un-normalized version materially understates homepage dependency.
 
 **Expected Output:** A cleaner top-20 landing page list with "Homepage (normalized)" now clearly the dominant single row, likely 40%+ of entrances alone.
 
-### Query 2.10 — First-Session Activation Rate by Channel
+### Query 2.10 - First-Session Activation Rate by Channel
 
-**Purpose:** Directly tests whether channels differ in the *quality* of new users they bring, prompted by Query 2.7's finding that paid search skews almost entirely new (9.25% returning) — this asks whether that paid-search traffic actually engages once it arrives.
+**Purpose:** Directly tests whether channels differ in the *quality* of new users they bring, prompted by Query 2.7's finding that paid search skews almost entirely new (9.25% returning) this asks whether that paid-search traffic actually engages once it arrives.
 
 ```sql
 WITH new_sessions AS (
@@ -473,15 +473,15 @@ HAVING new_sessions > 100
 ORDER BY new_sessions DESC;
 ```
 
-**Business Interpretation:** If `cpc/google` shows a materially lower `pct_engaged` than `organic/google` despite similar new-session volume, that's evidence of lower-quality paid traffic — informs a real budget conversation in Section 10, not just a volume comparison.
+**Business Interpretation:** If `cpc/google` shows a materially lower `pct_engaged` than `organic/google` despite similar new-session volume, that's evidence of lower-quality paid traffic informs a real budget conversation in Section 10, not just a volume comparison.
 
 **Expected Output:** One row per major channel restricted to first-ever sessions, `pct_engaged` likely varying meaningfully across channels (organic typically outperforms paid on engagement quality in comparable ecommerce datasets, but this must be confirmed against actual output, not assumed).
 
 ---
 
-## SECTION 3 — Activation Metrics Queries
+## SECTION 3 - Activation Metrics Queries
 
-### Query 3.1 — First-Session Product View Rate
+### Query 3.1 - First-Session Product View Rate
 
 **Purpose:** Implements Metric 3.1. Notes [R4] does not block this query (presence-of-event check, not item-detail dependent).
 
@@ -511,11 +511,11 @@ FROM session_flags
 WHERE session_number = 1;
 ```
 
-**Business Interpretation:** A low rate here (relative to the overall `view_item` volume) signals a homepage/navigation problem specific to new visitors — they're arriving but not reaching the catalog.
+**Business Interpretation:** A low rate here (relative to the overall `view_item` volume) signals a homepage/navigation problem specific to new visitors they're arriving but not reaching the catalog.
 
 **Expected Output:** A single summary row; benchmark against the overall product-view rate across all sessions (not just first ones) to see if new visitors specifically underperform.
 
-### Query 3.2 — Time-to-First-Add-to-Cart (Median)
+### Query 3.2 - Time-to-First-Add-to-Cart (Median)
 
 **Purpose:** Implements Metric 3.2.
 
@@ -543,11 +543,11 @@ JOIN first_touch ft USING (user_pseudo_id)
 WHERE TIMESTAMP_DIFF(TIMESTAMP_MICROS(fc.first_add_to_cart_ts), TIMESTAMP_MICROS(ft.user_first_touch_timestamp), SECOND) >= 0;
 ```
 
-**Business Interpretation:** A short median (minutes, not days) suggests users who add to cart do so decisively within their first visit; a long median suggests a multi-visit research pattern before commitment — directly relevant given Query 1.3's finding that most purchases happen on returning (not first) sessions.
+**Business Interpretation:** A short median (minutes, not days) suggests users who add to cart do so decisively within their first visit; a long median suggests a multi-visit research pattern before commitment directly relevant given Query 1.3's finding that most purchases happen on returning (not first) sessions.
 
-**Expected Output:** A single row with `median_seconds_to_first_cart` and the count of users this applies to (should be close to, but likely below, total unique users — not everyone adds to cart).
+**Expected Output:** A single row with `median_seconds_to_first_cart` and the count of users this applies to (should be close to, but likely below, total unique users not everyone adds to cart).
 
-### Query 3.3 — First-Session Engagement Rate
+### Query 3.3 - First-Session Engagement Rate
 
 **Purpose:** Implements Metric 3.3.
 
@@ -570,15 +570,15 @@ FROM sessions
 WHERE session_number = 1;
 ```
 
-**Business Interpretation:** The cleanest non-monetary activation signal — pairs directly with Query 2.10's channel breakdown of the same metric to identify both the overall baseline and channel-level deviations from it.
+**Business Interpretation:** The cleanest non-monetary activation signal pairs directly with Query 2.10's channel breakdown of the same metric to identify both the overall baseline and channel-level deviations from it.
 
 **Expected Output:** A single summary row; compare directly against Query 2.10's per-channel breakdown for consistency.
 
 ---
 
-## SECTION 4 — Engagement Metrics Queries
+## SECTION 4 - Engagement Metrics Queries
 
-### Query 4.1 — Engagement Rate (Weekly Trend)
+### Query 4.1 - Engagement Rate (Weekly Trend)
 
 **Purpose:** Implements Metric 4.1.
 
@@ -605,11 +605,11 @@ ORDER BY week_start;
 
 **Business Interpretation:** Track trend, not level. A multi-week decline is grounds to investigate a specific site change or content-quality issue before it shows up in the harder-to-reverse funnel/revenue metrics.
 
-**Expected Output:** ~13-14 weekly rows; cross-reference against the Query 2.3 finding (rising new-user share) — if engagement rate is stable while new-user share rises, the new visitors are at least engaging at the same rate as before, a partial mitigant to the retention concern.
+**Expected Output:** ~13-14 weekly rows; cross-reference against the Query 2.3 finding (rising new-user share) if engagement rate is stable while new-user share rises, the new visitors are at least engaging at the same rate as before, a partial mitigant to the retention concern.
 
-### Query 4.2 — Average Engagement Time per Session (Capped, per R5)
+### Query 4.2 - Average Engagement Time per Session (Capped, per R5)
 
-**Purpose:** Implements Metric 4.2. [R5] mandatory — cap applied before aggregation.
+**Purpose:** Implements Metric 4.2. [R5] mandatory cap applied before aggregation.
 
 ```sql
 WITH capped_events AS (
@@ -634,11 +634,11 @@ SELECT
 FROM session_totals;
 ```
 
-**Business Interpretation:** Report mean AND median together — per the §6.5 finding, even after capping individual events at 1 hour, a session with many capped events could still sum to an inflated total, so the median remains the more trustworthy headline number.
+**Business Interpretation:** Report mean AND median together per the §6.5 finding, even after capping individual events at 1 hour, a session with many capped events could still sum to an inflated total, so the median remains the more trustworthy headline number.
 
 **Expected Output:** A single summary row; expect mean somewhat above median given the residual right-skew even after per-event capping.
 
-### Query 4.3 — Pages per Session
+### Query 4.3 - Pages per Session
 
 **Purpose:** Implements Metric 4.3.
 
@@ -658,11 +658,11 @@ SELECT
 FROM sessions;
 ```
 
-**Business Interpretation:** Read alongside Query 4.2 (engagement time) — high pages-per-session with low engagement time would suggest confused navigation rather than genuine interest; the two must always be reported as a pair, never independently.
+**Business Interpretation:** Read alongside Query 4.2 (engagement time) high pages-per-session with low engagement time would suggest confused navigation rather than genuine interest; the two must always be reported as a pair, never independently.
 
 **Expected Output:** A single summary row; median likely lower than mean given the presence of debug-traffic-linked duplicate page_view firing noted in earlier batches.
 
-### Query 4.4 — Sessions per User
+### Query 4.4 - Sessions per User
 
 **Purpose:** Implements Metric 4.4. Confirms/refines the §2.2 validation baseline (1.33 sessions/user) with a distribution view, not just an average.
 
@@ -682,13 +682,13 @@ SELECT
 FROM user_sessions;
 ```
 
-**Business Interpretation:** `pct_single_session_users` is the sharper, more decision-relevant number than the average — it directly quantifies what share of the user base never comes back even once, setting up the Section 7 retention narrative with a concrete baseline figure rather than just an average.
+**Business Interpretation:** `pct_single_session_users` is the sharper, more decision-relevant number than the average it directly quantifies what share of the user base never comes back even once, setting up the Section 7 retention narrative with a concrete baseline figure rather than just an average.
 
 **Expected Output:** A single summary row; given the 1.33 average, expect `pct_single_session_users` to be a large majority (likely 70%+) with a smaller tail of highly repeat-active users pulling the average up.
 
-### Query 4.5 — Scroll Depth Distribution
+### Query 4.5 - Scroll Depth Distribution
 
-**Purpose:** Uses `event_params.percent_scrolled`, a documented-but-not-yet-queried field from `02_Data_Understanding.md` §4.1 — a genuine content-engagement signal worth including now that we're in the Engagement section.
+**Purpose:** Uses `event_params.percent_scrolled`, a documented-but-not-yet-queried field from `02_Data_Understanding.md` §4.1 a genuine content-engagement signal worth including now that we're in the Engagement section.
 
 ```sql
 SELECT
@@ -700,19 +700,19 @@ GROUP BY scroll_depth
 ORDER BY scroll_depth;
 ```
 
-**Business Interpretation:** GA4's default scroll trigger fires at 90% depth, so a single dominant bucket at 90 is expected and not itself informative — this query mainly exists to confirm whether any *other* scroll-depth thresholds were custom-configured (multiple distinct values would indicate a customized implementation worth knowing about for content-engagement analysis).
+**Business Interpretation:** GA4's default scroll trigger fires at 90% depth, so a single dominant bucket at 90 is expected and not itself informative this query mainly exists to confirm whether any *other* scroll-depth thresholds were custom-configured (multiple distinct values would indicate a customized implementation worth knowing about for content-engagement analysis).
 
 **Expected Output:** Likely a single dominant row at `scroll_depth = 90`; if only one value appears, this metric is not usable for granular content-engagement analysis and should be documented as such rather than forced into a chart.
 
 ---
 
-**Batch 2 complete — 9 queries across Section 2B (follow-ups), Section 3 (Activation), and Section 4 (Engagement).**
+**Batch 2 complete 9 queries across Section 2B (follow-ups), Section 3 (Activation), and Section 4 (Engagement).**
 
-**Batch 2 execution notes (from actual BigQuery results):** Homepage normalization confirmed at 45.96% of entrances, exactly as estimated. Channel-level activation engagement is remarkably uniform (~70-71%) across organic/direct/referral/paid, with `cpc/google` the lowest of the real channels (70.11%) and `(data deleted)` a persistent outlier (96.01%, still an open investigation item). **Two decisive findings:** only 19.97% of first-ever sessions ever view a product (the real top-of-funnel leak, not checkout), and 82.47% of all users are single-session, one-and-done visitors — hard confirmation of the "brand engagement, not repeat-revenue engine" framing. **One critical flag requiring resolution before further trend analysis:** Query 4.1 shows engagement rate jumping from ~47-58% to 85-91% in a single week (Dec 28) — investigated below before proceeding.
+**Batch 2 execution notes (from actual BigQuery results):** Homepage normalization confirmed at 45.96% of entrances, exactly as estimated. Channel-level activation engagement is remarkably uniform (~70-71%) across organic/direct/referral/paid, with `cpc/google` the lowest of the real channels (70.11%) and `(data deleted)` a persistent outlier (96.01%, still an open investigation item). **Two decisive findings:** only 19.97% of first-ever sessions ever view a product (the real top-of-funnel leak, not checkout), and 82.47% of all users are single-session, one-and-done visitors hard confirmation of the "brand engagement, not repeat-revenue engine" framing. **One critical flag requiring resolution before further trend analysis:** Query 4.1 shows engagement rate jumping from ~47-58% to 85-91% in a single week (Dec 28) investigated below before proceeding.
 
-### Query 4.6 — Diagnostic: Engagement Rate Step-Change Investigation (Dec 28 Anomaly)
+### Query 4.6 - Diagnostic: Engagement Rate Step-Change Investigation (Dec 28 Anomaly)
 
-**Purpose:** Investigates whether the Query 4.1 step-change is a real behavioral shift or an instrumentation/config change, by checking whether the underlying `session_engaged` parameter's *presence rate* (not just its value) shifts at the same point — a config change would show up as a change in whether the parameter fires at all, not just what value it carries.
+**Purpose:** Investigates whether the Query 4.1 step-change is a real behavioral shift or an instrumentation/config change, by checking whether the underlying `session_engaged` parameter's *presence rate* (not just its value) shifts at the same point a config change would show up as a change in whether the parameter fires at all, not just what value it carries.
 
 ```sql
 WITH daily_check AS (
@@ -737,17 +737,17 @@ WHERE event_dt BETWEEN '2020-12-20' AND '2021-01-10'
 ORDER BY event_dt;
 ```
 
-**Business Interpretation:** If `pct_with_session_engaged_param` or `pct_debug` shows a sharp discontinuity exactly at Dec 28, that confirms a tagging/config change and the pre/post periods **cannot be compared as a single continuous trend line** without that caveat — the Executive Dashboard must either split the series at this point with an annotation, or the pre-period must be treated as the more reliable baseline (it's more consistent week-to-week, which is itself evidence something changed rather than user behavior gradually shifting).
+**Business Interpretation:** If `pct_with_session_engaged_param` or `pct_debug` shows a sharp discontinuity exactly at Dec 28, that confirms a tagging/config change and the pre/post periods **cannot be compared as a single continuous trend line** without that caveat the Executive Dashboard must either split the series at this point with an annotation, or the pre-period must be treated as the more reliable baseline (it's more consistent week-to-week, which is itself evidence something changed rather than user behavior gradually shifting).
 
-**Expected Output:** A daily table spanning Dec 20–Jan 10; the diagnostic question is a clean before/after break exactly on Dec 28 in one or more of the percentage columns — that's the smoking gun for a config change rather than a real trend.
+**Expected Output:** A daily table spanning Dec 20–Jan 10; the diagnostic question is a clean before/after break exactly on Dec 28 in one or more of the percentage columns that's the smoking gun for a config change rather than a real trend.
 
 ---
 
-## SECTION 5 — Commerce Metrics Queries
+## SECTION 5 - Commerce Metrics Queries
 
-### Query 5.1 — Total Revenue (Weekly, Source of Truth per R3)
+### Query 5.1 - Total Revenue (Weekly, Source of Truth per R3)
 
-**Purpose:** Implements Metric 5.1. [R3] mandatory — transaction-level revenue only, never reconciled to item-level.
+**Purpose:** Implements Metric 5.1. [R3] mandatory transaction-level revenue only, never reconciled to item-level.
 
 ```sql
 SELECT
@@ -760,11 +760,11 @@ GROUP BY week_start
 ORDER BY week_start;
 ```
 
-**Business Interpretation:** The Executive Dashboard hero revenue chart. Must display the Black Friday/Cyber Monday/Christmas annotation directly on the chart — per `01_Project_Overview.md`, raw revenue trend without that flag will visually overstate "growth."
+**Business Interpretation:** The Executive Dashboard hero revenue chart. Must display the Black Friday/Cyber Monday/Christmas annotation directly on the chart per `01_Project_Overview.md`, raw revenue trend without that flag will visually overstate "growth."
 
 **Expected Output:** ~13-14 weekly rows; expect the same Nov-Dec peak/Jan decline shape already seen in Query 1.1 (WTU), since revenue and transacting-user-count should move together directionally.
 
-### Query 5.2 — Average Order Value (Cleaned, per R2)
+### Query 5.2 - Average Order Value (Cleaned, per R2)
 
 **Purpose:** Implements Metric 5.2. [R2] mandatory.
 
@@ -787,11 +787,11 @@ SELECT
 FROM cleaned_transactions;
 ```
 
-**Business Interpretation:** Report both AOV and median order value — per the Metric 5.2 definition, the mean can be pulled upward by the bulk/corporate orders already confirmed in §6.5 validation (up to $1,530, 400 units).
+**Business Interpretation:** Report both AOV and median order value per the Metric 5.2 definition, the mean can be pulled upward by the bulk/corporate orders already confirmed in §6.5 validation (up to $1,530, 400 units).
 
 **Expected Output:** A single summary row; AOV likely somewhat above the $48 median purchase value already observed in the §4.4 validation query, given known bulk-order outliers.
 
-### Query 5.3 — Items per Transaction (Mean + Median, per R2)
+### Query 5.3 - Items per Transaction (Mean + Median, per R2)
 
 **Purpose:** Implements Metric 5.3.
 
@@ -813,11 +813,11 @@ SELECT
 FROM cleaned_transactions;
 ```
 
-**Business Interpretation:** A large mean/median gap (expected, given the confirmed 400-unit bulk order) supports reporting median as the "typical customer" figure and flagging the mean separately as skewed by bulk/corporate buyers — a distinct customer segment worth its own analysis, not blended into typical-shopper metrics.
+**Business Interpretation:** A large mean/median gap (expected, given the confirmed 400-unit bulk order) supports reporting median as the "typical customer" figure and flagging the mean separately as skewed by bulk/corporate buyers a distinct customer segment worth its own analysis, not blended into typical-shopper metrics.
 
 **Expected Output:** Median likely 1-2 items; mean noticeably higher due to bulk-order skew.
 
-### Query 5.4 — Refund Rate (Open Validation Item — Volume Check First)
+### Query 5.4 - Refund Rate (Open Validation Item — Volume Check First)
 
 **Purpose:** Implements Metric 5.4, but per its flagged Stage 3 open validation item, this query FIRST checks refund volume/completeness before the rate is trusted.
 
@@ -843,13 +843,13 @@ FROM `bigquery-public-data.ga4_obfuscated_sample_ecommerce.events_*` AS refund
 WHERE event_name = 'refund';
 ```
 
-**Business Interpretation:** Note there is no `refund` event in the 17 confirmed event types from Stage 1 discovery (`page_view` through `view_item_list`) — this query is expected to return **zero rows**, which itself is the finding: refunds are either not tracked as a distinct event in this implementation, or captured only via the `ecommerce.refund_value_in_usd` field on other event types. **Do not report a 0% refund rate as "no refunds occur"** — report it as "refund tracking is not observable via a dedicated event in this dataset," a data-limitation finding, not a business finding.
+**Business Interpretation:** Note there is no `refund` event in the 17 confirmed event types from Stage 1 discovery (`page_view` through `view_item_list`) this query is expected to return **zero rows**, which itself is the finding: refunds are either not tracked as a distinct event in this implementation, or captured only via the `ecommerce.refund_value_in_usd` field on other event types. **Do not report a 0% refund rate as "no refunds occur"** report it as "refund tracking is not observable via a dedicated event in this dataset," a data-limitation finding, not a business finding.
 
-**Expected Output:** Likely 0 rows in Step 1 — resolves the Stage 3 open validation item with a clear negative finding rather than leaving it ambiguous.
+**Expected Output:** Likely 0 rows in Step 1 resolves the Stage 3 open validation item with a clear negative finding rather than leaving it ambiguous.
 
-### Query 5.5 — Revenue per Session (RPS) by Device
+### Query 5.5 - Revenue per Session (RPS) by Device
 
-**Purpose:** Implements Metric 5.5, cut by device — directly tests whether the confirmed 58%/40%/2% desktop/mobile/tablet session split (§3.3) translates proportionally into revenue, or whether one device type over/under-monetizes relative to its traffic share.
+**Purpose:** Implements Metric 5.5, cut by device directly tests whether the confirmed 58%/40%/2% desktop/mobile/tablet session split (§3.3) translates proportionally into revenue, or whether one device type over/under-monetizes relative to its traffic share.
 
 ```sql
 WITH sessions_by_device AS (
@@ -881,15 +881,15 @@ JOIN revenue_by_device r USING (device_category)
 ORDER BY revenue_per_session DESC;
 ```
 
-**Business Interpretation:** If desktop's revenue-per-session is disproportionately higher than its 58% session share would suggest, that's a strong, concrete argument for a mobile-checkout UX investigation in Stage 6 — this single query can make or break the "mobile experience needs investment" recommendation.
+**Business Interpretation:** If desktop's revenue-per-session is disproportionately higher than its 58% session share would suggest, that's a strong, concrete argument for a mobile-checkout UX investigation in Stage 6 this single query can make or break the "mobile experience needs investment" recommendation.
 
-**Expected Output:** Three rows (desktop/mobile/tablet); given this dataset skews desktop-majority (an atypical pattern for ecommerce generally), it's plausible desktop also converts better — must be confirmed from actual output, not assumed from industry norms.
+**Expected Output:** Three rows (desktop/mobile/tablet); given this dataset skews desktop-majority (an atypical pattern for ecommerce generally), it's plausible desktop also converts better must be confirmed from actual output, not assumed from industry norms.
 
 ---
 
-## SECTION 6 — Funnel Metrics Queries
+## SECTION 6 - Funnel Metrics Queries
 
-### Query 6.1 — View-to-Cart Rate (Session-Scoped)
+### Query 6.1 - View-to-Cart Rate (Session-Scoped)
 
 **Purpose:** Implements Metric 6.1. [R4] applies to any product-level cut, not to this session-presence version.
 
@@ -911,11 +911,11 @@ SELECT
 FROM session_flags;
 ```
 
-**Business Interpretation:** This is the session-scoped rate that should replace the naive raw-event ratio (~15%) referenced in `02_Data_Understanding.md`. Compare the two directly — a materially different session-scoped number is itself worth reporting as a methodology finding.
+**Business Interpretation:** This is the session-scoped rate that should replace the naive raw-event ratio (~15%) referenced in `02_Data_Understanding.md`. Compare the two directly a materially different session-scoped number is itself worth reporting as a methodology finding.
 
 **Expected Output:** A single summary row; given only 19.97% of *first* sessions ever view a product (Query 3.1) but this query covers *all* sessions (including returning ones, which likely convert better), expect this overall rate to be meaningfully higher than the first-session-only activation figure.
 
-### Query 6.2 — Cart-to-Checkout Rate (Session-Scoped)
+### Query 6.2 - Cart-to-Checkout Rate (Session-Scoped)
 
 **Purpose:** Implements Metric 6.2.
 
@@ -937,11 +937,11 @@ SELECT
 FROM session_flags;
 ```
 
-**Business Interpretation:** Compare against the ~66% naive event-level ratio noted in `04_Metrics_Framework.md` Metric 6.2 — session-scoping should produce a similar or slightly higher number here, since this step doesn't have the item-population coverage gap that view_item has.
+**Business Interpretation:** Compare against the ~66% naive event-level ratio noted in `04_Metrics_Framework.md` Metric 6.2 session-scoping should produce a similar or slightly higher number here, since this step doesn't have the item-population coverage gap that view_item has.
 
 **Expected Output:** A single summary row, plausibly in the 55-70% range.
 
-### Query 6.3 — Checkout-to-Purchase Rate with Granular Step Breakdown
+### Query 6.3 - Checkout-to-Purchase Rate with Granular Step Breakdown
 
 **Purpose:** Implements Metric 6.3, including the granular 3-step breakdown explicitly called for in its Common Mistakes guidance.
 
@@ -967,11 +967,11 @@ SELECT
 FROM session_flags;
 ```
 
-**Business Interpretation:** This is the query that pinpoints exactly which checkout sub-step (shipping-info entry, payment-info entry, or final submission) loses the most sessions — the single most actionable output in the entire funnel analysis, since each stage implies a different fix (shipping-cost transparency vs. payment-method friction vs. a technical submission bug).
+**Business Interpretation:** This is the query that pinpoints exactly which checkout sub-step (shipping-info entry, payment-info entry, or final submission) loses the most sessions the single most actionable output in the entire funnel analysis, since each stage implies a different fix (shipping-cost transparency vs. payment-method friction vs. a technical submission bug).
 
 **Expected Output:** A monotonically decreasing 4-step waterfall; the stage with the steepest percentage drop from the prior stage is the number-one Stage 7 recommendation priority.
 
-### Query 6.4 — Overall View-to-Purchase Conversion Rate (with Reconciliation Check)
+### Query 6.4 - Overall View-to-Purchase Conversion Rate (with Reconciliation Check)
 
 **Purpose:** Implements Metric 6.4, including the self-consistency check called for in its SQL Logic guidance (product of stage rates should approximately equal the direct end-to-end rate).
 
@@ -993,13 +993,13 @@ SELECT
 FROM session_flags;
 ```
 
-**Business Interpretation:** The single headline funnel number for leadership — **must always be presented alongside Queries 6.1-6.3's breakdown**, never in isolation, per the Metric 6.4 Common Mistakes guidance.
+**Business Interpretation:** The single headline funnel number for leadership **must always be presented alongside Queries 6.1-6.3's breakdown**, never in isolation, per the Metric 6.4 Common Mistakes guidance.
 
-**Expected Output:** A single summary row; sanity-check this result against the product of Query 6.1 × 6.2 × 6.3's rates — they should be in the same ballpark (not identical, due to sessions that skip stages non-linearly, but a large divergence would indicate a session-key construction bug worth investigating.)
+**Expected Output:** A single summary row; sanity-check this result against the product of Query 6.1 × 6.2 × 6.3's rates they should be in the same ballpark (not identical, due to sessions that skip stages non-linearly, but a large divergence would indicate a session-key construction bug worth investigating.)
 
 ### Query 6.5 — Cart Abandonment Rate by Device
 
-**Purpose:** Implements Metric 6.5, cut by device to directly test whether mobile shows higher abandonment than desktop — a natural follow-up to Query 5.5's device-revenue finding.
+**Purpose:** Implements Metric 6.5, cut by device to directly test whether mobile shows higher abandonment than desktop a natural follow-up to Query 5.5's device-revenue finding.
 
 ```sql
 WITH session_flags AS (
@@ -1024,19 +1024,19 @@ GROUP BY device_category
 ORDER BY cart_abandonment_rate_pct DESC;
 ```
 
-**Business Interpretation:** If mobile shows a materially higher abandonment rate than desktop, this becomes one of the highest-confidence, most specific recommendations in `07_Business_Recommendations.md` — "fix mobile checkout" is a much stronger, more actionable claim when backed by this exact comparison than a generic "reduce cart abandonment" statement.
+**Business Interpretation:** If mobile shows a materially higher abandonment rate than desktop, this becomes one of the highest-confidence, most specific recommendations in `07_Business_Recommendations.md` "fix mobile checkout" is a much stronger, more actionable claim when backed by this exact comparison than a generic "reduce cart abandonment" statement.
 
 **Expected Output:** Three rows; industry pattern generally shows mobile abandonment higher than desktop, but must be confirmed against this dataset's actual desktop-majority, higher-engagement pattern rather than assumed from general ecommerce benchmarks.
 
 ---
 
-**Batch 3 complete — 11 queries across Section 4 diagnostic follow-up, Section 5 (Commerce), and Section 6 (Funnel).**
+**Batch 3 complete : 11 queries across Section 4 diagnostic follow-up, Section 5 (Commerce), and Section 6 (Funnel).**
 
-**Batch 3 execution notes (from actual BigQuery results):** [R6] new rule established — Query 4.6 confirms `engagement_time_msec` presence jumps from a flat 0.0% to 42-44% exactly at Dec 28, 2020, proving the Query 4.1 engagement-rate step-change is a tagging/config change, not real behavior; pre/post periods are not comparable without a split annotation. Revenue cross-checks cleanly ($362,165 confirmed two independent ways). [R2] cleaning removes 14.7% of revenue ($53,335) from AOV scope. Refund Rate open item resolved: 0 refund events exist. Mobile slightly out-monetizes desktop per session despite lower volume. Cart-to-checkout naive event ratio (66%) vs. true session-scoped rate (39.25%) is a 27-point gap — the funnel-grain trap materializing in real data. Checkout's real bottleneck is shipping→payment info (38.6% loss), not payment→purchase. View-to-purchase (6.1%) nearly doubles the naive stage-multiplication estimate (3.4%), suggesting cross-session cart persistence — tested below. Desktop shows the highest cart abandonment (81.73%), inverting the common mobile-worse assumption.
+**Batch 3 execution notes (from actual BigQuery results):** [R6] new rule established Query 4.6 confirms `engagement_time_msec` presence jumps from a flat 0.0% to 42-44% exactly at Dec 28, 2020, proving the Query 4.1 engagement-rate step-change is a tagging/config change, not real behavior; pre/post periods are not comparable without a split annotation. Revenue cross-checks cleanly ($362,165 confirmed two independent ways). [R2] cleaning removes 14.7% of revenue ($53,335) from AOV scope. Refund Rate open item resolved: 0 refund events exist. Mobile slightly out-monetizes desktop per session despite lower volume. Cart-to-checkout naive event ratio (66%) vs. true session-scoped rate (39.25%) is a 27-point gap the funnel-grain trap materializing in real data. Checkout's real bottleneck is shipping→payment info (38.6% loss), not payment→purchase. View-to-purchase (6.1%) nearly doubles the naive stage-multiplication estimate (3.4%), suggesting cross-session cart persistence tested below. Desktop shows the highest cart abandonment (81.73%), inverting the common mobile-worse assumption.
 
-### Query 6.6 — Cross-Session Cart Persistence Test
+### Query 6.6 - Cross-Session Cart Persistence Test
 
-**Purpose:** Directly tests the hypothesis raised by Query 6.4's divergence — that a meaningful share of `begin_checkout` sessions had their cart built in a *prior* session by the same user, not the same session, which would explain why session-scoped funnel multiplication understates the true end-to-end rate.
+**Purpose:** Directly tests the hypothesis raised by Query 6.4's divergence that a meaningful share of `begin_checkout` sessions had their cart built in a *prior* session by the same user, not the same session, which would explain why session-scoped funnel multiplication understates the true end-to-end rate.
 
 ```sql
 WITH cart_events AS (
@@ -1075,15 +1075,15 @@ GROUP BY cart_origin
 ORDER BY checkout_sessions DESC;
 ```
 
-**Business Interpretation:** If `prior_session_cart` accounts for a meaningful share, it confirms carts persist across sessions (standard ecommerce behavior — cart contents typically survive via cookies/local storage independent of GA4 session boundaries), meaning true funnel and cart-abandonment analysis should ultimately be done at the **user** grain across sessions, not purely within a single session — a methodology refinement for `06_Analysis.md`. A large `no_cart_found` share would instead suggest "buy now"/direct-purchase flows that skip the cart page entirely.
+**Business Interpretation:** If `prior_session_cart` accounts for a meaningful share, it confirms carts persist across sessions (standard ecommerce behavior cart contents typically survive via cookies/local storage independent of GA4 session boundaries), meaning true funnel and cart-abandonment analysis should ultimately be done at the **user** grain across sessions, not purely within a single session a methodology refinement for `06_Analysis.md`. A large `no_cart_found` share would instead suggest "buy now"/direct-purchase flows that skip the cart page entirely.
 
-**Expected Output:** Three categories; given the magnitude of the divergence in Query 6.4 (11,106 vs. 5,961), expect `prior_session_cart` and/or `no_cart_found` combined to represent a substantial minority of checkout sessions — the exact split determines which explanation (cart persistence vs. buy-now flow) dominates.
+**Expected Output:** Three categories; given the magnitude of the divergence in Query 6.4 (11,106 vs. 5,961), expect `prior_session_cart` and/or `no_cart_found` combined to represent a substantial minority of checkout sessions the exact split determines which explanation (cart persistence vs. buy-now flow) dominates.
 
 ---
 
-## SECTION 7 — Retention Metrics Queries
+## SECTION 7 - Retention Metrics Queries
 
-### Query 7.1 — Day 1 / Day 7 / Day 30 Retention
+### Query 7.1 - Day 1 / Day 7 / Day 30 Retention
 
 **Purpose:** Implements Metric 7.1.
 
@@ -1111,11 +1111,11 @@ FROM cohort c
 LEFT JOIN user_active_dates a ON a.user_pseudo_id = c.user_pseudo_id;
 ```
 
-**Business Interpretation:** Given the confirmed 82.47% single-session-user rate (Query 4.4), expect all three retention figures to be low single digits — this query quantifies exactly how low, replacing the qualitative expectation with a hard number for the Executive Summary.
+**Business Interpretation:** Given the confirmed 82.47% single-session-user rate (Query 4.4), expect all three retention figures to be low single digits this query quantifies exactly how low, replacing the qualitative expectation with a hard number for the Executive Summary.
 
 **Expected Output:** A single summary row with `cohort_size` in the low hundreds of thousands and day1/7/30 retained counts each a small fraction of it.
 
-### Query 7.2 — Weekly Returning User Rate
+### Query 7.2 - Weekly Returning User Rate
 
 **Purpose:** Implements Metric 7.2.
 
@@ -1145,11 +1145,11 @@ GROUP BY active_week
 ORDER BY active_week;
 ```
 
-**Business Interpretation:** Should be the complement of Query 2.3's New User Rate (returning_rate ≈ 100% − new_user_rate) — a useful internal consistency check; given Query 2.3 already showed new-user rate rising toward 90%+, expect this to show a correspondingly low and falling returning-user rate.
+**Business Interpretation:** Should be the complement of Query 2.3's New User Rate (returning_rate ≈ 100% - new_user_rate) a useful internal consistency check; given Query 2.3 already showed new-user rate rising toward 90%+, expect this to show a correspondingly low and falling returning-user rate.
 
 **Expected Output:** ~13-14 weekly rows; expect returning-user rate to decline over the window, mirroring the inverse of the already-confirmed rising new-user-rate trend.
 
-### Query 7.3 — Repeat Purchase Rate (Cleaned, per R2)
+### Query 7.3 - Repeat Purchase Rate (Cleaned, per R2)
 
 **Purpose:** Implements Metric 7.3. [R2] mandatory.
 
@@ -1173,11 +1173,11 @@ SELECT
 FROM user_txn_counts;
 ```
 
-**Business Interpretation:** This is the single most important number for the "brand engagement vehicle vs. repeat-revenue business" framing question posed in `01_Project_Overview.md` — now answerable with a precise figure rather than a hypothesis.
+**Business Interpretation:** This is the single most important number for the "brand engagement vehicle vs. repeat-revenue business" framing question posed in `01_Project_Overview.md` now answerable with a precise figure rather than a hypothesis.
 
 **Expected Output:** A single summary row; given the 82.47% single-session-user finding, expect this rate to be very low (likely single digits), reinforcing that repeat purchasing is the exception, not the norm, for this store.
 
-### Query 7.4 — New vs. Returning Session Mix (Weekly Trend)
+### Query 7.4 - New vs. Returning Session Mix (Weekly Trend)
 
 **Purpose:** Implements Metric 7.4.
 
@@ -1201,17 +1201,17 @@ GROUP BY week_start
 ORDER BY week_start;
 ```
 
-**Business Interpretation:** The fast-moving, session-grain daily/weekly monitoring proxy — flags a sudden retention shift well before the slower, more rigorous Query 7.2/7.3 user-grain metrics would surface it in a monthly report.
+**Business Interpretation:** The fast-moving, session-grain daily/weekly monitoring proxy flags a sudden retention shift well before the slower, more rigorous Query 7.2/7.3 user-grain metrics would surface it in a monthly report.
 
 **Expected Output:** ~13-14 weekly rows; directionally should track Query 7.2 closely, since both measure the same underlying new/returning split from different angles (session vs. user grain).
 
 ---
 
-## SECTION 8 — Customer Metrics Queries
+## SECTION 8 - Customer Metrics Queries
 
-### Query 8.1 — LTV Snapshot Coverage & Distribution (Open Item Resolution)
+### Query 8.1 - LTV Snapshot Coverage & Distribution (Open Item Resolution)
 
-**Purpose:** Implements Metric 8.1, but first resolves its Stage 3/4 open validation item — a null-rate/distribution check on `user_ltv.revenue` that was never run in Stage 3.
+**Purpose:** Implements Metric 8.1, but first resolves its Stage 3/4 open validation item a null-rate/distribution check on `user_ltv.revenue` that was never run in Stage 3.
 
 ```sql
 -- Step 1: Coverage check (resolves the open validation item)
@@ -1234,11 +1234,11 @@ SELECT
 FROM user_ltv_snapshot;
 ```
 
-**Business Interpretation:** Resolves the open item flagged in `04_Metrics_Framework.md` §8.1 — if `users_with_null_ltv` is near 0 and the distribution is sane (not all zeros), the field is confirmed usable; if nearly all values are 0 or null, this metric must be down-weighted or dropped from the Executive Scorecard rather than reported with false confidence.
+**Business Interpretation:** Resolves the open item flagged in `04_Metrics_Framework.md` §8.1 if `users_with_null_ltv` is near 0 and the distribution is sane (not all zeros), the field is confirmed usable; if nearly all values are 0 or null, this metric must be down-weighted or dropped from the Executive Scorecard rather than reported with false confidence.
 
 **Expected Output:** Coverage should be near-complete (this is a per-event struct, always present, just often 0 before a purchase); the quartile distribution's most useful number will likely be the 75th/max percentiles, since most users (non-purchasers) will show 0.
 
-### Query 8.2 — Purchase Frequency
+### Query 8.2 - Purchase Frequency
 
 **Purpose:** Implements Metric 8.2. [R2] mandatory.
 
@@ -1257,11 +1257,11 @@ SELECT
 FROM cleaned_purchases;
 ```
 
-**Business Interpretation:** Read directly alongside Query 7.3's Repeat Purchase Rate — together they answer two different questions: "do people come back at all" (7.3) vs. "how many times do they buy given that they do" (this metric).
+**Business Interpretation:** Read directly alongside Query 7.3's Repeat Purchase Rate together they answer two different questions: "do people come back at all" (7.3) vs. "how many times do they buy given that they do" (this metric).
 
 **Expected Output:** A single summary row; given the low repeat-purchase-rate expectation, this should sit close to 1.0, with any meaningful excess above 1.0 itself worth flagging as a notable finding.
 
-### Query 8.3 — Value Tier Segmentation
+### Query 8.3 - Value Tier Segmentation
 
 **Purpose:** Implements Metric 8.3, using LTV quartiles from Query 8.1.
 
@@ -1293,23 +1293,23 @@ GROUP BY value_tier
 ORDER BY tier_total_ltv DESC;
 ```
 
-**Business Interpretation:** Quantifies exactly how thin the "High value" segment is in absolute user count — the critical caveat flagged in Metric 8.3's Common Mistakes guidance (never cite tier behavior without stating tier size).
+**Business Interpretation:** Quantifies exactly how thin the "High value" segment is in absolute user count the critical caveat flagged in Metric 8.3's Common Mistakes guidance (never cite tier behavior without stating tier size).
 
-**Expected Output:** Four tiers; given only 4,466 cleaned purchasing users out of 270,154 total (1.65%), expect "Non-purchaser" to represent the overwhelming majority (~98%+) of users, with "High value" a very small absolute count — must be stated explicitly alongside any tier-based finding in Stage 6/7.
-
----
-
-**Batch 4 complete — 8 queries across Section 6 follow-up (cart persistence), Section 7 (Retention), and Section 8 (Customer).**
-
-**Batch 4 execution notes (from actual BigQuery results):** Query 6.6 partially overturns the cart-persistence hypothesis — cross-session persistence is minor (3.41%); the dominant factor is 42.91% of checkout sessions having no detectable add_to_cart at all (buy-now flow or tracking gap, flagged as open UX/instrumentation question). Day 1/7/30 retention confirmed at 4.63% / 0.71% / 0.13% — the headline retention figure for the Executive Summary. Repeat Purchase Rate came in higher than predicted at 11.85%, showing past purchasers are meaningfully warmer than the general population despite near-zero general session retention. **[R3] extended:** `user_ltv.revenue` sums to $407,626 vs. the validated $362,165 real revenue — a 12.6% overstatement; usable only for relative segmentation, never as a revenue figure. Value Tier Segmentation confirms extreme concentration: 0.43% of users ("High value" tier, 1,161 people) drive ~62% of measured customer value.
+**Expected Output:** Four tiers; given only 4,466 cleaned purchasing users out of 270,154 total (1.65%), expect "Non-purchaser" to represent the overwhelming majority (~98%+) of users, with "High value" a very small absolute count must be stated explicitly alongside any tier-based finding in Stage 6/7.
 
 ---
 
-## SECTION 9 — Product Metrics Queries
+**Batch 4 complete : 8 queries across Section 6 follow-up (cart persistence), Section 7 (Retention), and Section 8 (Customer).**
 
-### Query 9.1 — Product View Count (Top 20, per R4)
+**Batch 4 execution notes (from actual BigQuery results):** Query 6.6 partially overturns the cart-persistence hypothesis cross-session persistence is minor (3.41%); the dominant factor is 42.91% of checkout sessions having no detectable add_to_cart at all (buy-now flow or tracking gap, flagged as open UX/instrumentation question). Day 1/7/30 retention confirmed at 4.63% / 0.71% / 0.13% the headline retention figure for the Executive Summary. Repeat Purchase Rate came in higher than predicted at 11.85%, showing past purchasers are meaningfully warmer than the general population despite near-zero general session retention. **[R3] extended:** `user_ltv.revenue` sums to $407,626 vs. the validated $362,165 real revenue a 12.6% overstatement; usable only for relative segmentation, never as a revenue figure. Value Tier Segmentation confirms extreme concentration: 0.43% of users ("High value" tier, 1,161 people) drive ~62% of measured customer value.
 
-**Purpose:** Implements Metric 9.1. [R4] mandatory — scoped to items-populated `view_item` rows only (62.65% coverage per §5.2).
+---
+
+## SECTION 9 - Product Metrics Queries
+
+### Query 9.1 - Product View Count (Top 20, per R4)
+
+**Purpose:** Implements Metric 9.1. [R4] mandatory scoped to items-populated `view_item` rows only (62.65% coverage per §5.2).
 
 ```sql
 SELECT
@@ -1324,11 +1324,11 @@ ORDER BY view_count DESC
 LIMIT 20;
 ```
 
-**Business Interpretation:** Baseline demand-signal ranking — must be captioned "among item-identifiable views (62.65% of all view_item events)" per [R4], not presented as total product-view volume.
+**Business Interpretation:** Baseline demand-signal ranking must be captioned "among item-identifiable views (62.65% of all view_item events)" per [R4], not presented as total product-view volume.
 
 **Expected Output:** A top-20 product list; given the entrance-page data from Query 2.5 (Apparel, YouTube-brand, Dino Game Tee were top landing categories), expect those same products/categories to dominate this ranking too.
 
-### Query 9.2 — Product-Level View-to-Cart Rate (Top 20 by Volume, Min Threshold)
+### Query 9.2 - Product-Level View-to-Cart Rate (Top 20 by Volume, Min Threshold)
 
 **Purpose:** Implements Metric 9.2. Applies a minimum-view threshold to avoid noisy rates from low-volume products (a direct application of the statistical-significance caution embedded in the metric's Common Mistakes guidance).
 
@@ -1357,13 +1357,13 @@ ORDER BY v.views DESC
 LIMIT 20;
 ```
 
-**Business Interpretation:** Products with high views but a rate well below the ~19.7% overall session-scoped baseline (Query 6.1) are pricing/presentation problems; products with low relative views but a high rate are discoverability opportunities — both are actionable, opposite-direction recommendations.
+**Business Interpretation:** Products with high views but a rate well below the ~19.7% overall session-scoped baseline (Query 6.1) are pricing/presentation problems; products with low relative views but a high rate are discoverability opportunities both are actionable, opposite-direction recommendations.
 
 **Expected Output:** Top 20 products by view volume with individual conversion rates; expect meaningful spread around the ~15-20% baseline, not uniform performance.
 
-### Query 9.3 — Product Revenue Share by Category (Relative Only, per R3)
+### Query 9.3 - Product Revenue Share by Category (Relative Only, per R3)
 
-**Purpose:** Implements Metric 9.3 at category grain. [R3] mandatory — never reconciled to transaction-level Total Revenue.
+**Purpose:** Implements Metric 9.3 at category grain. [R3] mandatory never reconciled to transaction-level Total Revenue.
 
 ```sql
 SELECT
@@ -1376,13 +1376,13 @@ GROUP BY item.item_category
 ORDER BY category_revenue DESC;
 ```
 
-**Business Interpretation:** Shows revenue concentration by category — a small number of categories (likely Apparel, given its dominance in landing pages and views) probably account for a disproportionate share, informing merchandising/homepage placement priorities.
+**Business Interpretation:** Shows revenue concentration by category a small number of categories (likely Apparel, given its dominance in landing pages and views) probably account for a disproportionate share, informing merchandising/homepage placement priorities.
 
-**Expected Output:** A ranked list of item categories; total will not exactly equal the validated $362,165 headline revenue per [R3] — expected and documented, not an error to reconcile.
+**Expected Output:** A ranked list of item categories; total will not exactly equal the validated $362,165 headline revenue per [R3] expected and documented, not an error to reconcile.
 
-### Query 9.4 — Category Performance Index (Views, Conversion, Revenue Combined)
+### Query 9.4 - Category Performance Index (Views, Conversion, Revenue Combined)
 
-**Purpose:** Implements Metric 9.4 — the composite rollup combining 9.1-9.3 at category grain for a single merchandising-review view.
+**Purpose:** Implements Metric 9.4, the composite rollup combining 9.1-9.3 at category grain for a single merchandising-review view.
 
 ```sql
 WITH views AS (
@@ -1417,15 +1417,15 @@ WHERE v.views >= 500
 ORDER BY revenue DESC;
 ```
 
-**Business Interpretation:** A single table for the merchandising planning review — instantly flags any category that's high-traffic/low-conversion (fix the PDP/pricing) versus low-traffic/high-conversion (invest in visibility/promotion).
+**Business Interpretation:** A single table for the merchandising planning review instantly flags any category that's high-traffic/low-conversion (fix the PDP/pricing) versus low-traffic/high-conversion (invest in visibility/promotion).
 
 **Expected Output:** A ranked category table with 4 comparable metrics side by side, ready to drop directly into a Stage 6/7 merchandising recommendation.
 
 ---
 
-## SECTION 10 — Marketing Metrics Queries
+## SECTION 10 - Marketing Metrics Queries
 
-### Query 10.1 — Channel Conversion Rate (Session-Scoped, Volume-Qualified)
+### Query 10.1 - Channel Conversion Rate (Session-Scoped, Volume-Qualified)
 
 **Purpose:** Implements Metric 10.1, paired explicitly with volume (per its own Common Mistakes guidance against ranking by rate alone).
 
@@ -1450,11 +1450,11 @@ HAVING sessions > 500
 ORDER BY sessions DESC;
 ```
 
-**Business Interpretation:** Must be read together, never rate alone — a channel with few sessions and a lucky high rate is not a signal to reallocate budget. Compare directly against Query 2.4's session-share table for the full volume+quality picture.
+**Business Interpretation:** Must be read together, never rate alone a channel with few sessions and a lucky high rate is not a signal to reallocate budget. Compare directly against Query 2.4's session-share table for the full volume+quality picture.
 
-**Expected Output:** A ranked table of major channels with both volume and rate visible in the same view — designed specifically to prevent the volume/quality conflation the metric warns against.
+**Expected Output:** A ranked table of major channels with both volume and rate visible in the same view designed specifically to prevent the volume/quality conflation the metric warns against.
 
-### Query 10.2 — Channel Revenue Share (Attributed, per R2/R3)
+### Query 10.2 - Channel Revenue Share (Attributed, per R2/R3)
 
 **Purpose:** Implements Metric 10.2. Applies [R2] transaction cleaning before attribution.
 
@@ -1481,11 +1481,11 @@ GROUP BY medium, source
 ORDER BY revenue DESC;
 ```
 
-**Business Interpretation:** Read directly against Query 10.1's conversion rate for the same channels — a channel with a large revenue share driven purely by volume (not rate) should not be mistaken for the "best" channel in a quality sense.
+**Business Interpretation:** Read directly against Query 10.1's conversion rate for the same channels a channel with a large revenue share driven purely by volume (not rate) should not be mistaken for the "best" channel in a quality sense.
 
-**Expected Output:** Total across all rows will be close to, but slightly below, the cleaned $308,830 figure from Query 5.2 (session-attribution join may drop a small number of edge-case sessions without a resolvable session_key match) — a small gap here is expected, not an error.
+**Expected Output:** Total across all rows will be close to, but slightly below, the cleaned $308,830 figure from Query 5.2 (session-attribution join may drop a small number of edge-case sessions without a resolvable session_key match) a small gap here is expected, not an error.
 
-### Query 10.3 — New User Share by Channel
+### Query 10.3 - New User Share by Channel
 
 **Purpose:** Implements Metric 10.3.
 
@@ -1507,11 +1507,11 @@ GROUP BY medium, source
 ORDER BY new_users DESC;
 ```
 
-**Business Interpretation:** Distinguishes discovery channels (high new-user share) from retention/re-engagement channels (low new-user share, high returning share per Query 2.7) — the two should be judged on different rubrics, not the same "did it bring new users" yardstick.
+**Business Interpretation:** Distinguishes discovery channels (high new-user share) from retention/re-engagement channels (low new-user share, high returning share per Query 2.7) the two should be judged on different rubrics, not the same "did it bring new users" yardstick.
 
 **Expected Output:** A ranked channel table; `cpc/google` and `organic/google` should dominate new-user share (consistent with Query 2.7's earlier finding that paid search skews almost entirely new).
 
-### Query 10.4 — Organic vs. Paid Traffic Mix (Corrected Medium Classification)
+### Query 10.4 - Organic vs. Paid Traffic Mix (Corrected Medium Classification)
 
 **Purpose:** Implements Metric 10.4, using `traffic_source.medium` directly (not `gclid` presence, per the explicit warning in the metric's Common Mistakes guidance).
 
@@ -1537,17 +1537,17 @@ GROUP BY traffic_type
 ORDER BY sessions DESC;
 ```
 
-**Business Interpretation:** Given Query 2.4's confirmed channel mix (`cpc/google` only 4.34% of sessions), expect this to show heavy organic/direct dependence — a real growth-headroom finding: paid search is barely used relative to its typical share in comparable ecommerce sites, suggesting room for incremental paid investment as a growth lever.
+**Business Interpretation:** Given Query 2.4's confirmed channel mix (`cpc/google` only 4.34% of sessions), expect this to show heavy organic/direct dependence a real growth-headroom finding: paid search is barely used relative to its typical share in comparable ecommerce sites, suggesting room for incremental paid investment as a growth lever.
 
 **Expected Output:** Four categories; "Paid" likely in the low single digits of total sessions, consistent with the 4.34% cpc/google figure already confirmed.
 
 ---
 
-**Batch 5 complete — 8 queries across Section 9 (Product) and Section 10 (Marketing).**
+**Batch 5 complete : 8 queries across Section 9 (Product) and Section 10 (Marketing).**
 
-**Batch 5 execution notes (from actual BigQuery results):** **Critical data-quality finding** — `item_category` is tagged inconsistently between browsing and purchase events (a full breadcrumb path like `"Home/Apparel/Men's / Unisex/"` on view/cart events vs. a clean label like `"Apparel"` on purchase events), causing high-traffic categories to falsely appear as 0%-converting in Query 9.4. Fix via `item_id` join, added below as Query 9.5. `(data deleted)` confirmed as a genuinely exceptional segment: 3.14% conversion, 12.97% of revenue from 6.17% of sessions — the best-converting channel in the dataset. Paid search (`cpc/google`) converts *below* organic google (0.98% vs. 1.11%), refining last batch's "clear headroom for paid" read into "fix targeting before scaling spend." Apparel dominates item revenue at 47.42%.
+**Batch 5 execution notes (from actual BigQuery results):** **Critical data-quality finding** `item_category` is tagged inconsistently between browsing and purchase events (a full breadcrumb path like `"Home/Apparel/Men's / Unisex/"` on view/cart events vs. a clean label like `"Apparel"` on purchase events), causing high-traffic categories to falsely appear as 0%-converting in Query 9.4. Fix via `item_id` join, added below as Query 9.5. `(data deleted)` confirmed as a genuinely exceptional segment: 3.14% conversion, 12.97% of revenue from 6.17% of sessions the best-converting channel in the dataset. Paid search (`cpc/google`) converts *below* organic google (0.98% vs. 1.11%), refining last batch's "clear headroom for paid" read into "fix targeting before scaling spend." Apparel dominates item revenue at 47.42%.
 
-### Query 9.5 — Category Performance Index, Corrected (item_id-based, not item_category-based)
+### Query 9.5 - Category Performance Index, Corrected (item_id-based, not item_category-based)
 
 **Purpose:** Fixes the inconsistent-taxonomy issue discovered in Query 9.4 by deriving each product's category from its `purchase`-event tagging (the clean version) and joining that back to browsing-stage data via the stable `item_id`, rather than trusting `item_category` directly on browsing events.
 
@@ -1592,9 +1592,9 @@ HAVING views >= 500
 ORDER BY revenue DESC;
 ```
 
-### Query 9.6 — Category Performance Index, Corrected via item_name (Diagnostic Fix for Query 9.5's Failure)
+### Query 9.6 - Category Performance Index, Corrected via item_name (Diagnostic Fix for Query 9.5's Failure)
 
-**Purpose:** Query 9.5's `item_id`-based join returned 100% "Unmapped" — meaning `item_id` itself doesn't join cleanly across event types in this implementation, a second, deeper instance of the same inconsistent-tagging pattern found on `item_category`. Switching to `item_name`, which Queries 9.1/9.2 already showed matching cleanly across view/cart events.
+**Purpose:** Query 9.5's `item_id`-based join returned 100% "Unmapped" meaning `item_id` itself doesn't join cleanly across event types in this implementation, a second, deeper instance of the same inconsistent-tagging pattern found on `item_category`. Switching to `item_name`, which Queries 9.1/9.2 already showed matching cleanly across view/cart events.
 
 ```sql
 WITH canonical_category AS (
@@ -1636,21 +1636,21 @@ HAVING views >= 500
 ORDER BY revenue DESC;
 ```
 
-**Business Interpretation:** If this version still shows a large "Unmapped" share, the issue isn't the join key at all — it means most *products that are ever viewed* are simply never purchased at the volume needed to appear in the purchase-side lookup (plausible given the confirmed ~1.65% purchasing-user rate), which is a legitimate finding, not a bug. If it resolves cleanly with mostly-mapped categories and non-zero revenue on high-view categories, that confirms `item_id` format inconsistency (not `item_category` alone) was the real root cause — an even more significant data-quality finding than originally identified, since it means **`item_id` cannot be trusted as a join key anywhere in this dataset**, a caveat that must be added prominently to `02_Data_Understanding.md`'s `items` field documentation.
+**Business Interpretation:** If this version still shows a large "Unmapped" share, the issue isn't the join key at all it means most *products that are ever viewed* are simply never purchased at the volume needed to appear in the purchase-side lookup (plausible given the confirmed ~1.65% purchasing-user rate), which is a legitimate finding, not a bug. If it resolves cleanly with mostly-mapped categories and non-zero revenue on high-view categories, that confirms `item_id` format inconsistency (not `item_category` alone) was the real root cause an even more significant data-quality finding than originally identified, since it means **`item_id` cannot be trusted as a join key anywhere in this dataset**, a caveat that must be added prominently to `02_Data_Understanding.md`'s `items` field documentation.
 
-**Expected Output:** Either a mostly-resolved category table (confirming the item_id-format hypothesis) or a still-large "Unmapped" share (confirming it's a genuine view-without-purchase sparsity issue) — both are informative, valid outcomes; run and report whichever actually occurs rather than assuming.
+**Expected Output:** Either a mostly-resolved category table (confirming the item_id-format hypothesis) or a still-large "Unmapped" share (confirming it's a genuine view-without-purchase sparsity issue) both are informative, valid outcomes; run and report whichever actually occurs rather than assuming.
 
-**Query 9.6 execution result — CONFIRMED:** switching the join key from `item_id` to `item_name` resolved the mapping cleanly (Apparel $168,987, New $26,156, Bags $23,924, etc. — reconciling to within ~5% of the original `item_category`-based total, an expected residual from naming variants). Only 193,921 views/50,627 carts remain genuinely "Unmapped" — a legitimate finding (products browsed but never purchased in-window, consistent with the ~1.65% purchasing rate), not a join defect. **Root cause confirmed: `item_id` does not reliably join between browsing-stage and purchase-stage events in this dataset.**
+**Query 9.6 execution result CONFIRMED:** switching the join key from `item_id` to `item_name` resolved the mapping cleanly (Apparel $168,987, New $26,156, Bags $23,924, etc. reconciling to within ~5% of the original `item_category`-based total, an expected residual from naming variants). Only 193,921 views/50,627 carts remain genuinely "Unmapped" a legitimate finding (products browsed but never purchased in-window, consistent with the ~1.65% purchasing rate), not a join defect. **Root cause confirmed: `item_id` does not reliably join between browsing-stage and purchase-stage events in this dataset.**
 
-**[R7] — NEW RULE: `item_id` is unreliable as a cross-event-type join key in this dataset; use `item_name` for any product-level join between browsing and purchase events.** (Trade-off: `item_name` isn't a guaranteed-unique identifier the way `item_id` nominally should be — variant collisions are theoretically possible — but it is empirically the reliable choice here, confirmed by this query.) This is now a permanent addition to `02_Data_Understanding.md`'s `items` field documentation and `09_Analytics_Decision_Log.md`.
+**[R7] - NEW RULE: `item_id` is unreliable as a cross-event-type join key in this dataset; use `item_name` for any product-level join between browsing and purchase events.** (Trade-off: `item_name` isn't a guaranteed-unique identifier the way `item_id` nominally should be variant collisions are theoretically possible but it is empirically the reliable choice here, confirmed by this query.) This is now a permanent addition to `02_Data_Understanding.md`'s `items` field documentation and `09_Analytics_Decision_Log.md`.
 
 ---
 
-## SECTION 11 — Executive & Cross-Validation Queries
+## SECTION 11 - Executive & Cross-Validation Queries
 
-### Query 11.1 — Executive Scorecard (Single Rollup Query)
+### Query 11.1 - Executive Scorecard (Single Rollup Query)
 
-**Purpose:** Combines the top-line metric from each section into one query — the literal backing data for the `04_Metrics_Framework.md` §11 Executive Scorecard table and the Stage 8 Executive Summary's headline numbers.
+**Purpose:** Combines the top-line metric from each section into one query the literal backing data for the `04_Metrics_Framework.md` §11 Executive Scorecard table and the Stage 8 Executive Summary's headline numbers.
 
 ```sql
 WITH sessions AS (
@@ -1674,13 +1674,13 @@ SELECT
   (SELECT ROUND(AVG(revenue), 2) FROM cleaned_purchases) AS aov;
 ```
 
-**Business Interpretation:** The single source query behind the Executive Dashboard's top-row scorecard — every number here should already reconcile with a specific earlier query in this repository (traceable, auditable, not a fresh untested calculation).
+**Business Interpretation:** The single source query behind the Executive Dashboard's top-row scorecard every number here should already reconcile with a specific earlier query in this repository (traceable, auditable, not a fresh untested calculation).
 
-**Expected Output:** One row, six columns — should match: `total_sessions` ≈ Query 2.1 sum, `total_transacting_users` ≈ sum of Query 1.1, `total_revenue_cleaned`/`aov` ≈ Query 5.2 exactly.
+**Expected Output:** One row, six columns should match: `total_sessions` ≈ Query 2.1 sum, `total_transacting_users` ≈ sum of Query 1.1, `total_revenue_cleaned`/`aov` ≈ Query 5.2 exactly.
 
-### Query 11.2 — Cross-Validation: Revenue Reconciliation Across All Three Sources
+### Query 11.2 - Cross-Validation: Revenue Reconciliation Across All Three Sources
 
-**Purpose:** A single query that puts all three revenue figures discovered across this repository side by side — transaction-level (source of truth), item-level (relative only), and `user_ltv` (segmentation only) — making the [R3] distinctions visually explicit rather than scattered across many queries.
+**Purpose:** A single query that puts all three revenue figures discovered across this repository side by side transaction-level (source of truth), item-level (relative only), and `user_ltv` (segmentation only) making the [R3] distinctions visually explicit rather than scattered across many queries.
 
 ```sql
 SELECT 'Transaction-level (source of truth)' AS revenue_source,
@@ -1696,11 +1696,11 @@ SELECT 'user_ltv.revenue (segmentation use only)',
   ));
 ```
 
-**Business Interpretation:** This query alone justifies the entire [R3] rule to a skeptical stakeholder — three legitimate, correctly-computed figures that intentionally do not match, each serving a different purpose. Include this exact table in `09_Analytics_Decision_Log.md` as the evidence for that rule.
+**Business Interpretation:** This query alone justifies the entire [R3] rule to a skeptical stakeholder three legitimate, correctly-computed figures that intentionally do not match, each serving a different purpose. Include this exact table in `09_Analytics_Decision_Log.md` as the evidence for that rule.
 
 **Expected Output:** Three rows: ~$362,165 (transaction-level), a lower figure (~$308-320K range, item-level, per the confirmed 28.56% gap), and ~$407,626 (user_ltv, the confirmed overstatement).
 
-### Query 11.3 — Data Quality Flags Summary (Living Reference)
+### Query 11.3 - Data Quality Flags Summary (Living Reference)
 
 **Purpose:** A single reference query listing every methodology rule established across Stages 3-5, for quick onboarding of anyone new to this project (a Product Manager, a new analyst) without needing to read all prior documents first.
 
@@ -1716,18 +1716,18 @@ SELECT * FROM UNNEST([
 ]);
 ```
 
-**Business Interpretation:** This is a documentation device, not an analytical query — but it's genuinely useful as a single "why does this project do X" reference, and belongs verbatim in `09_Analytics_Decision_Log.md`.
+**Business Interpretation:** This is a documentation device, not an analytical query but it's genuinely useful as a single "why does this project do X" reference, and belongs verbatim in `09_Analytics_Decision_Log.md`.
 
-**Expected Output:** Six rows, one per established rule — this is the complete rule set carried forward into every remaining stage of the project.
+**Expected Output:** Six rows, one per established rule this is the complete rule set carried forward into every remaining stage of the project.
 
 ---
 
-**Batch 6 (final) complete — 5 queries across Section 9 correction and Section 11 (Executive/Cross-Validation).**
+**Batch 6 (final) complete : 5 queries across Section 9 correction and Section 11 (Executive/Cross-Validation).**
 
 ## Repository Summary
 
-**53 queries total across Sections 1-11**, each implementing a specific metric from `04_Metrics_Framework.md`, each tested against real BigQuery output rather than assumed, and each carrying forward the R1-R6 rules established through actual evidence rather than upfront assumption. This is intentionally short of the original 75-100 target — the decision was to prioritize **query depth and cross-validation** (follow-up queries prompted by real findings, diagnostic queries resolving anomalies, correction queries fixing discovered data-quality issues) over reaching a round number with repetitive per-dimension cuts. Every one of the 6 methodology rules (R1-R6) and every major finding in this document is now traceable to a specific query and its actual output — the standard a real analytics team would hold a production metrics layer to.
+**53 queries total across Sections 1-11**, each implementing a specific metric from `04_Metrics_Framework.md`, each tested against real BigQuery output rather than assumed, and each carrying forward the R1-R6 rules established through actual evidence rather than upfront assumption. This is intentionally short of the original 75-100 target the decision was to prioritize **query depth and cross-validation** (follow-up queries prompted by real findings, diagnostic queries resolving anomalies, correction queries fixing discovered data-quality issues) over reaching a round number with repetitive per-dimension cuts. Every one of the 6 methodology rules (R1-R6) and every major finding in this document is now traceable to a specific query and its actual output the standard a real analytics team would hold a production metrics layer to.
 
-**If a higher query count is wanted for the portfolio's numeric claim, straightforward additions would be:** per-geography (country-level) cuts of Sections 5/6/10 metrics (~8-10 queries), per-week trend versions of the Section 9 product metrics (~5-6 queries), and day-of-week/hour-of-day seasonality cuts of Section 1/2 metrics (~5-6 queries) — happy to generate any of these on request.
+**If a higher query count is wanted for the portfolio's numeric claim, straightforward additions would be:** per-geography (country-level) cuts of Sections 5/6/10 metrics (~8-10 queries), per-week trend versions of the Section 9 product metrics (~5-6 queries), and day-of-week/hour-of-day seasonality cuts of Section 1/2 metrics (~5-6 queries) happy to generate any of these on request.
 
-**Next: Stage 6 — Analysis** (Funnel, User Journey, Revenue, Retention, Cohort, Device, Geographic, Marketing, Product Performance), which synthesizes all 53 queries' actual results into the narrative analysis document.
+**Next: Stage 6 : Analysis** (Funnel, User Journey, Revenue, Retention, Cohort, Device, Geographic, Marketing, Product Performance), which synthesizes all 53 queries' actual results into the narrative analysis document.
