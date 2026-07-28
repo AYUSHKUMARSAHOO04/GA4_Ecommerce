@@ -4,7 +4,7 @@
 **Prerequisite:** This document assumes `06_Analysis.md` has been read. It does not re-explain findings it converts them into decisions.
 **The question this document answers:** What should the business do next, in what order, owned by whom, measured how?
 
-Throughout this document, recommendations are referenced by code (**BR1–BR13**) so they can be traced consistently across every matrix below.
+Throughout this document, recommendations are referenced by code (**BR1-BR13**) so they can be traced consistently across every matrix below.
 
 ---
 
