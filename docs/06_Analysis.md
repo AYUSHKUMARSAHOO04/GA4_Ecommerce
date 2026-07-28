@@ -1,8 +1,8 @@
 # 06 : Executive Product Analytics Report
 
-**Google Merchandise Store - 92-Day Performance Review (Nov 1, 2020 - Jan 31, 2021)**
+**Google Merchandise Store 92-Day Performance Review (Nov 1, 2020 - Jan 31, 2021)**
 **Prepared for:** CEO, VP Product, Head of Analytics, Growth, Marketing, Finance, Product Leadership
-**Basis:** 54 validated SQL queries executed against `bigquery-public-data.ga4_obfuscated_sample_ecommerce`, cross-checked internally, with all findings traceable to a specific query ID and methodology rule (R1–R7). No figure in this report is estimated or invented where evidence doesn't exist, this report says so explicitly rather than filling the gap.
+**Basis:** 54 validated SQL queries executed against `bigquery-public-data.ga4_obfuscated_sample_ecommerce`, cross-checked internally, with all findings traceable to a specific query ID and methodology rule (R1-R7). No figure in this report is estimated or invented where evidence doesn't exist, this report says so explicitly rather than filling the gap.
 
 ---
 
