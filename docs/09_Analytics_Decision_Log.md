@@ -12,7 +12,7 @@ A durable, chronological record of every assumption, validation result, and meth
 
 Every non-trivial analytics engagement makes dozens of small methodology decisions how to define a session, which field to trust, how to handle an anomaly. Left undocumented, those decisions live only in the head of whoever made them. This log exists so they don't have to be rediscovered, or worse, silently re-broken, by the next person who touches this dataset.
 
-## 2. The Methodology Rule Registry (R1–R7)
+## 2. The Methodology Rule Registry (R1-R7)
 
 | Rule | Decision | Evidence | Discovered In | Status |
 |---|---|---|---|---|
