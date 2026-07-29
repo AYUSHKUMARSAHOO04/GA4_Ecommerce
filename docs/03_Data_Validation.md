@@ -58,7 +58,7 @@ Top user_pseudo_id by row count: 1,309 events over 92 days, 0.03% of total event
 ### 2.5 Session Reconstruction Validation
 Query returned the full 100-row limit, virtually all showing `distinct_session_numbers = 1` (good) but `total_entrances = 2` (violation expected ≤1).
 
-**Verdict: ⚠️ WARNING** this is **not a broken session key**; session_number consistency (the more serious failure mode) is intact. The doubled-entrance pattern is consistent with duplicate event firing, and correlates directly with the debug-traffic finding in §6.4 below (a page loading twice under `debug_mode` will log two `entrances=1` events in the same session). **Do not exclude sessions on this basis alone** instead, treat `entrances` as a signal to dedupe on `(session_key, event_name='page_view', page_location)` when precise landing-page analysis is needed in Stage 6.
+**⚠️ WARNING** this is **not a broken session key**; session_number consistency (the more serious failure mode) is intact. The doubled-entrance pattern is consistent with duplicate event firing, and correlates directly with the debug-traffic finding in §6.4 below (a page loading twice under `debug_mode` will log two `entrances=1` events in the same session). **Do not exclude sessions on this basis alone** instead, treat `entrances` as a signal to dedupe on `(session_key, event_name='page_view', page_location)` when precise landing-page analysis is needed in Stage 6.
 
 ---
 
