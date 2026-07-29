@@ -96,19 +96,15 @@
 
 ## 6. 90-Day Roadmap
 
-```
-MONTH 1                    MONTH 2                    MONTH 3
-────────────────────       ────────────────────       ────────────────────
-Data integrity lockdown    Homepage A/B test live      Homepage fix implemented
-Paid search spend freeze   Checkout payment fix        Checkout fix launched
-Landing page reporting     built                       Loyalty program v1 launched
-  normalized                Paid search targeting       Desktop checkout audit
-High-value tier profile     review complete              findings finalized
-Corrected merchandising    Session-recording            Strategic retention
-  report distributed        diagnostics underway          decision (BR12) made
-                            Loyalty program designed     Data platform scoped
-                            (data deleted) investigation   for next quarter
-                              underway (Legal-gated)
+| **Month 1 - Stabilize & Validate** | **Month 2 - Optimize & Experiment** | **Month 3 - Scale & Execute** |
+|------------------------------------|-------------------------------------|-------------------------------|
+| Data integrity lockdown | Homepage A/B test launched | Homepage improvements implemented |
+| Paid search spend freeze | Checkout payment UX improvements | Checkout improvements deployed |
+| Landing page reporting normalized | Paid search targeting review completed | Loyalty Program v1 launched |
+| High-value customer profiling | Session-recording diagnostics underway | Desktop checkout audit completed |
+| Merchandise reporting corrected | Loyalty program designed | Findings validated & finalized |
+| Executive report distributed | `(data deleted)` investigation (Legal-gated) | Strategic retention decision (BR12) completed |
+| - | - | Data platform roadmap prepared for next quarter |
 ```
 
 **Key deliverables:** integrity-corrected reporting (M1), a live activation test and a scoped checkout fix (M2), a launched loyalty program and a leadership decision on retention strategy (M3).
