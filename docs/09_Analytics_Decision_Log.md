@@ -1,7 +1,3 @@
-**[↑ Back to README](../README.md)** &nbsp;·&nbsp; **[Repository Navigation](../README.md#-repository-structure)**
-
----
-
 # 09 : Analytics Decision Log
 
 A durable, chronological record of every assumption, validation result, and methodology decision made across this engagement written so a new analyst inheriting this dataset does not have to rediscover any of it.
@@ -81,5 +77,3 @@ A future analyst adding to this repository should:
 3. Treat §6's open items as the natural starting point for the next phase of work they are genuine gaps, not resolved findings dressed up as incomplete.
 
 ---
-
-**[← Previous: 08 Executive Summary](08_Executive_Summary.md)** &nbsp;|&nbsp; **[Back to README](../README.md)** &nbsp;|&nbsp; This is the final document in the sequence.
