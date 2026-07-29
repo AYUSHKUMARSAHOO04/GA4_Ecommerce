@@ -207,5 +207,3 @@ None of the 4 FAILs invalidate the project all four are addressable with explici
 4. **`view_item` product-level analysis is scoped to the 62.65% of rows with populated `items`**, with the coverage gap stated as an explicit caveat, not silently ignored.
 
 Additionally: `event_value_in_usd` is now a validated secondary signal on `purchase` events (assumption reversed from Stage 2); `engagement_time_msec` will be capped at 1 hour before averaging; device split is confirmed desktop-majority (58%/40%/2%), which should inform Stage 6/7 findings.
-
-**Proceeding to Stage 4: Metrics Framework**, built on top of these four rules.
