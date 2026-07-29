@@ -105,7 +105,6 @@
 | Merchandise reporting corrected | Loyalty program designed | Findings validated & finalized |
 | Executive report distributed | `(data deleted)` investigation (Legal-gated) | Strategic retention decision (BR12) completed |
 | - | - | Data platform roadmap prepared for next quarter |
-```
 
 **Key deliverables:** integrity-corrected reporting (M1), a live activation test and a scoped checkout fix (M2), a launched loyalty program and a leadership decision on retention strategy (M3).
 **Expected outcomes:** measurable movement on Metric 3.1 (activation) and Metric 6.3 (checkout), an initial read on loyalty-driven repeat purchase rate, and a resolved (or explicitly closed) investigation into the `(data deleted)` segment.
