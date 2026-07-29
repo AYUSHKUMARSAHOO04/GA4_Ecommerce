@@ -171,7 +171,7 @@ All core fields (`event_date`, `event_timestamp`, `event_name`, `user_pseudo_id`
 ### 6.3 Duplicate Events
 0 duplicate `(user_pseudo_id, event_timestamp, event_name)` groups found.
 
-**Genuinely clean; no row-level duplication at the raw grain, despite the transaction- and entrance-level duplication seen elsewhere (those are logical/business-key duplicates, not raw-row duplicates an important distinction).
+Genuinely clean; no row-level duplication at the raw grain, despite the transaction- and entrance-level duplication seen elsewhere (those are logical/business-key duplicates, not raw-row duplicates an important distinction).
 
 ### 6.4 Debug/Test Traffic
 | debug_events | total_events | pct_debug |
