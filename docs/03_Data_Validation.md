@@ -166,7 +166,7 @@ All core fields (`event_date`, `event_timestamp`, `event_name`, `user_pseudo_id`
 | geo.country | (not set) | 32,208 | 0.75% |
 | traffic_source.medium | (none) | 989,684 | 23.04% |
 
-**⚠️ WARNING (reclassified, not a defect)** `geo.country = (not set)` at 0.75% is a clean PASS on its own. `traffic_source.medium = (none)` at 23.04% technically crosses the mechanical 15% FAIL line, but **this is a misapplication of that rule** — `(none)` is GA4's legitimate label for **direct traffic** (typed URL / bookmark), not a missing-data defect. 23% direct traffic is realistic for an ecommerce site and will be reported as its own channel segment in Stage 6, not treated as a data quality gap. This is the kind of blind-rule-application mistake a junior analyst makes and a senior one catches.
+**⚠️ WARNING (reclassified, not a defect)** `geo.country = (not set)` at 0.75% is a clean PASS on its own. `traffic_source.medium = (none)` at 23.04% technically crosses the mechanical 15% FAIL line, but **this is a misapplication of that rule** `(none)` is GA4's legitimate label for **direct traffic** (typed URL / bookmark), not a missing-data defect. 23% direct traffic is realistic for an ecommerce site and will be reported as its own channel segment in Stage 6, not treated as a data quality gap. This is the kind of blind-rule-application mistake a junior analyst makes and a senior one catches.
 
 ### 6.3 Duplicate Events
 0 duplicate `(user_pseudo_id, event_timestamp, event_name)` groups found.
