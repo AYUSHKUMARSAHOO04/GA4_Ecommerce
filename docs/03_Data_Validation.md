@@ -130,7 +130,7 @@ Combined excess/affected rows are roughly 20%+ of the 5,692 purchase events once
 ### 5.1 event_params Completeness
 `ga_session_id`, `page_location`, `ga_session_number` are present on **100% of rows for all 17 event types**.
 
-**The strongest result in the entire suite. Session-grain and path-grain analysis can proceed with full confidence.
+The strongest result in the entire suite. Session-grain and path-grain analysis can proceed with full confidence.
 
 ### 5.2 items Completeness
 | event_name | total_events | pct_populated |
