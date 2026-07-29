@@ -1,11 +1,11 @@
-# 08 — Executive Summary & Board Briefing
+# 08 : Executive Summary & Board Briefing
 
 ## Cover
 
-**Project Title:** Google Merchandise Store — Product Analytics Engagement
-**Prepared By:** [Your Name], Product Analytics
+**Project Title:** Google Merchandise Store - Product Analytics Engagement
+**Prepared By:** Ayush Kumar Sahoo, Product Analytics
 **Date:** July 2026
-**Project Duration:** Full-funnel analysis of a 92-day operating window (Nov 1, 2020 – Jan 31, 2021)
+**Project Duration:** Full-funnel analysis of a 92-day operating window (Nov 1, 2020 - Jan 31, 2021)
 **Dataset:** GA4 BigQuery Export, `bigquery-public-data.ga4_obfuscated_sample_ecommerce` (public sample dataset; findings are directional and methodology-driven, per the scope note in `01_Project_Overview.md`)
 **Objective:** Determine where this ecommerce store loses customers, which segments and channels actually drive value, whether the business retains anyone, and what leadership should do about it in the next quarter.
 
@@ -15,15 +15,15 @@
 
 **Business Health:** Operationally sound, strategically under-leveraged. Traffic acquisition, checkout mechanics, and revenue processing all function normally. The gap is in converting interest into engagement and in retaining or activating the customers already proven to be valuable.
 
-**Top Opportunity:** Two segments already outperform the blended average by 2–3x — past purchasers (11.85% repeat-purchase rate vs. near-zero general retention) and the top 0.43% of users (driving ~62% of measured value) — and neither has a dedicated program built around it yet.
+**Top Opportunity:** Two segments already outperform the blended average by 2-3x past purchasers (11.85% repeat-purchase rate vs. near-zero general retention) and the top 0.43% of users (driving ~62% of measured value) and neither has a dedicated program built around it yet.
 
 **Largest Risk:** Two confirmed data-integrity issues (a tagging change that fakes an engagement-rate "improvement," and a broken product-ID join that fakes a "0%-converting" category) mean some existing reporting is currently wrong. Acting on unvalidated numbers is the single biggest near-term risk to good decision-making.
 
-**Biggest Win:** A fully validated, production-grade analytics layer — 54 SQL queries, 7 documented methodology rules, and a complete metrics framework — that makes every finding in this engagement traceable and defensible, not anecdotal.
+**Biggest Win:** A fully validated, production-grade analytics layer - 54 SQL queries, 7 documented methodology rules, and a complete metrics framework that makes every finding in this engagement traceable and defensible, not anecdotal.
 
-**Highest Priority:** Fix the reporting issues first (this quarter, low effort), then fix the homepage/navigation activation gap — only 19.97% of first-time visitors ever view a product, the single largest constraint on the entire business.
+**Highest Priority:** Fix the reporting issues first (this quarter, low effort), then fix the homepage/navigation activation gap only 19.97% of first-time visitors ever view a product, the single largest constraint on the entire business.
 
-**Overall Assessment:** This is a fixable, well-understood business problem, not an ambiguous one. Every recommendation in this engagement is backed by an executed query and a specific number — the path forward is a sequencing and focus decision, not a research problem.
+**Overall Assessment:** This is a fixable, well-understood business problem, not an ambiguous one. Every recommendation in this engagement is backed by an executed query and a specific number the path forward is a sequencing and focus decision, not a research problem.
 
 ---
 
@@ -31,7 +31,7 @@
 
 | KPI | Current State | Business Health | Priority | Owner |
 |---|---|---|---|---|
-| North Star — Weekly Transacting Users | Peaked at 711 (week of Dec 7); fell to 99 (final week) | Moderate — tracks seasonality, no independent growth signal yet | High | VP Product |
+| North Star Weekly Transacting Users | Peaked at 711 (week of Dec 7); fell to 99 (final week) | Moderate tracks seasonality, no independent growth signal yet | High | VP Product |
 | First-Session Product View Rate | 19.97% | **Critical** | Critical | Product |
 | Overall View-to-Purchase Conversion | 6.1% | Moderate | High | VP Product |
 | Checkout Completion Rate (post-checkout-start) | 43.62% | Good | Medium | Product/Eng |
@@ -68,13 +68,13 @@
 
 **Data-integrity risk (Critical, immediate).** Two confirmed measurement defects (R6, R7) mean specific dashboards were producing false conclusions until this engagement caught and corrected them. Any team still using the uncorrected versions is at risk of acting on wrong numbers today.
 
-**Structural retention risk (High, strategic).** Near-zero organic retention means this business has no safety net if acquisition slows — revenue is fully dependent on continuous new-visitor volume. This is a business-model characteristic, not a quick fix, and needs an explicit leadership decision (see `07_Business_Recommendations.md`, BR12).
+**Structural retention risk (High, strategic).** Near-zero organic retention means this business has no safety net if acquisition slows revenue is fully dependent on continuous new-visitor volume. This is a business-model characteristic, not a quick fix, and needs an explicit leadership decision (see `07_Business_Recommendations.md`, BR12).
 
-**Concentration risk (Medium, ongoing).** Both the homepage (46% of all entrances) and the customer base (0.43% of users driving 62% of value) represent single points of concentration — a homepage issue or the loss of a handful of top customers would have outsized impact.
+**Concentration risk (Medium, ongoing).** Both the homepage (46% of all entrances) and the customer base (0.43% of users driving 62% of value) represent single points of concentration a homepage issue or the loss of a handful of top customers would have outsized impact.
 
-**Compliance risk (Medium, contained).** Investigating the `(data deleted)` segment (Finding #5) touches privacy-redacted data and must proceed only with Legal approval — this is flagged, sequenced, and contained in the recommendations, not being pursued unilaterally.
+**Compliance risk (Medium, contained).** Investigating the `(data deleted)` segment (Finding #5) touches privacy-redacted data and must proceed only with Legal approval this is flagged, sequenced, and contained in the recommendations, not being pursued unilaterally.
 
-**Marketing efficiency risk (Medium, active).** Continued paid-search spend at current targeting quality is actively inefficient — this is a live, ongoing cost until `07_Business_Recommendations.md`'s BR6 is resolved.
+**Marketing efficiency risk (Medium, active).** Continued paid-search spend at current targeting quality is actively inefficient this is a live, ongoing cost until `07_Business_Recommendations.md`'s BR6 is resolved.
 
 ---
 
@@ -83,12 +83,12 @@
 | Recommendation | Owner | Priority | Expected KPI | Timeline |
 |---|---|---|---|---|
 | Data & Reporting Integrity Lockdown (BR7) | Analytics/Engineering | Critical | Reporting accuracy (precondition for all else) | Month 1 |
-| Homepage & Navigation Activation Redesign (BR1) | Product | Critical | First-Session Product View Rate (Metric 3.1) | Month 2–3 |
-| Checkout Payment-Step UX Fix (BR2) | Product/Engineering | Critical | Checkout-to-Purchase, granular (Metric 6.3) | Month 2–3 |
-| Past-Purchaser Loyalty Program (BR3) | Marketing/CRM | High | Repeat Purchase Rate (Metric 7.3) | Month 2–3 |
-| High-Value Tier Profiling & VIP Program (BR4) | Analytics/Marketing | High | Value Tier composition (Metric 8.3) | Month 1 (profile), 6–12mo (program) |
-| `(data deleted)` Segment Investigation (BR5) | Analytics/Legal/Marketing | High | Channel Conversion, if actionable (Metric 10.1/10.2) | Month 1–3 |
-| Paid Search Targeting Overhaul (BR6) | Marketing | High | Channel Conversion Rate (Metric 10.1) | Month 1–3 |
+| Homepage & Navigation Activation Redesign (BR1) | Product | Critical | First-Session Product View Rate (Metric 3.1) | Month 2-3 |
+| Checkout Payment-Step UX Fix (BR2) | Product/Engineering | Critical | Checkout-to-Purchase, granular (Metric 6.3) | Month 2-3 |
+| Past-Purchaser Loyalty Program (BR3) | Marketing/CRM | High | Repeat Purchase Rate (Metric 7.3) | Month 2-3 |
+| High-Value Tier Profiling & VIP Program (BR4) | Analytics/Marketing | High | Value Tier composition (Metric 8.3) | Month 1 (profile), 6-12mo (program) |
+| `(data deleted)` Segment Investigation (BR5) | Analytics/Legal/Marketing | High | Channel Conversion, if actionable (Metric 10.1/10.2) | Month 1-3 |
+| Paid Search Targeting Overhaul (BR6) | Marketing | High | Channel Conversion Rate (Metric 10.1) | Month 1-3 |
 
 *(Full recommendation set, including Medium-priority items and department-level ownership, is in `07_Business_Recommendations.md`.)*
 
@@ -141,80 +141,16 @@ Corrected merchandising    Session-recording            Strategic retention
 This engagement produced a complete, production-grade Product Analytics deliverable set:
 
 - **54 production SQL queries**, each mapped to a specific metric definition, executed against real BigQuery data, and validated against actual (not assumed) output.
-- **7 documented methodology rules (R1–R7)**, each discovered through evidence, not assumed upfront — including a confirmed instrumentation break and a confirmed broken join key, both caught before they could produce wrong conclusions.
-- **A complete metrics framework** spanning North Star, Acquisition, Activation, Engagement, Commerce, Funnel, Retention, Customer, Product, and Marketing metrics — each with formula, grain, dimension compatibility, and common-mistake guidance.
-- **A full executive analysis** (18 sections) connecting findings across every function — Marketing, Product, Growth, Finance — into a single causal narrative.
+- **7 documented methodology rules (R1–R7)**, each discovered through evidence, not assumed upfront including a confirmed instrumentation break and a confirmed broken join key, both caught before they could produce wrong conclusions.
+- **A complete metrics framework** spanning North Star, Acquisition, Activation, Engagement, Commerce, Funnel, Retention, Customer, Product, and Marketing metrics each with formula, grain, dimension compatibility, and common-mistake guidance.
+- **A full executive analysis** (18 sections) connecting findings across every function Marketing, Product, Growth, Finance into a single causal narrative.
 - **A strategic recommendations report** with 13 prioritized, ROI/effort-classified, KPI-linked initiatives and a full quarterly roadmap.
 - **Built entirely on GA4 BigQuery export data**, using the same nested-schema SQL patterns (`UNNEST`, correlated subqueries on `event_params`, session-grain reconstruction) required in real production GA4 analytics work.
 - **Production-ready documentation**, structured as a navigable, GitHub-publishable repository rather than a single monolithic notebook.
 
 ---
 
-## 9. Interview Talking Points
-
-**1. Why did you choose this project?**
-GA4's BigQuery export is the same nested, event-grain schema used in real production analytics at any company running GA4 — it's a legitimate test of whether I can do the job, not just write SQL against a clean flat table.
-
-**2. What was the biggest challenge in this project?**
-Recognizing that the dataset's grain is the event, not the user or session — nearly every early SQL mistake in this space comes from treating a `COUNT(*)` as a session or user count. I had to explicitly reconstruct session and user grain from `event_params` before any metric was trustworthy.
-
-**3. What was the hardest SQL problem you solved?**
-The `item_id` join failure (R7). My first fix attempt (joining browsing and purchase events on `item_id`) returned 100% "Unmapped" — a clean failure that told me the problem was deeper than I'd diagnosed. Switching to `item_name` as the join key resolved it and confirmed the root cause empirically rather than by assumption.
-
-**4. What was the single most important validation you ran?**
-The debug_mode traffic check. Finding that 85.74% of events (and 99.7%+ of sessions) carried `debug_mode=1` could have derailed the whole project if I'd reflexively filtered it out — instead I tested whether it was evenly distributed across channels (it was), which meant relative comparisons remained valid even though absolute volumes needed a caveat.
-
-**5. Walk me through one R1–R7 discovery.**
-R6: I noticed engagement rate jumped from ~50% to ~90% in a single week. Rather than reporting "engagement improved," I ran a diagnostic checking whether the underlying `engagement_time_msec` parameter's *presence rate* changed at the same point — it went from a flat 0% to 43% overnight, proving it was a tagging change, not real user behavior.
-
-**6. What's the biggest business insight in this project?**
-That the business's real constraint is upstream of the funnel entirely — only 19.97% of new visitors ever view a product. Most analyses of this dataset jump straight to "optimize checkout"; the data says checkout is comparatively healthy and the real leak is much earlier.
-
-**7. How did you prioritize your recommendations?**
-By evidence strength and leverage, not novelty — I built an explicit ROI/effort matrix and refused to place the most exciting finding (the `(data deleted)` segment) in a "sure thing" category, since its actionability is genuinely gated by a Legal review I can't resolve with more SQL.
-
-**8. What would you have done differently with more time?**
-Executed the geographic breakdown — I deliberately left it as an acknowledged gap rather than inventing a finding, but it's the clearest, lowest-effort next analysis given the underlying data quality was already confirmed sound.
-
-**9. How do you know your funnel numbers are correct?**
-I cross-validated the naive event-level ratio against a session-scoped version at every stage and found real, explained divergences (e.g., cart-to-checkout: 66% naive vs. 39.25% session-scoped) — the grain mismatch is a common, real error, and I caught it by comparing both methods rather than trusting the first one I computed.
-
-**10. What's your approach to data quality validation?**
-PASS/WARNING/FAIL scoring against explicit, pre-defined criteria for every check — 23 checks in this project, with 4 confirmed FAILs that each led to a documented methodology rule rather than being silently patched around.
-
-**11. How do you handle a finding that contradicts your hypothesis?**
-Directly — Query 6.6 tested my hypothesis that cross-session cart persistence explained a funnel divergence; the data showed persistence was a minor factor (3.4%) and a different explanation (no cart-add detected at all, 42.9%) dominated. I corrected the conclusion rather than keeping the more convenient original story.
-
-**12. What's the difference between a leading and lagging indicator in your framework?**
-Sessions and engagement rate are leading (they precede conversion); revenue and repeat-purchase rate are lagging (they're the outcome). My metrics framework tags every metric explicitly so a dashboard doesn't mix "what predicts the future" with "what already happened."
-
-**13. How would you explain `R3` to a non-technical stakeholder?**
-Three different, individually correct ways of measuring "revenue" exist in this data — transaction records, product-line records, and GA4's own running customer-value estimate — and they don't agree with each other by design. I picked one as the official number and explained why, rather than letting whichever number looked best win by default.
-
-**14. What's a mistake you see other analysts make with this kind of data?**
-Averaging GA4's `user_ltv` field across all of a user's events, including the rows before they ever purchased — this understates true value by an order of magnitude. I used `MAX()` per user instead, and explained why in the documentation.
-
-**15. How did you decide what NOT to include in this analysis?**
-Geographic analysis and several "future opportunities" (attribution modeling, pricing elasticity, market basket analysis) are explicitly out of scope — I'd rather clearly label a gap than pad the report with an unsupported claim.
-
-**16. What does "confidence level" mean in your reporting?**
-Every major finding is tagged High, Medium, or Low based on how directly the data supports it — a measured number (e.g., 19.97% product-view rate) is High; a root-cause explanation for *why* (e.g., homepage navigation friction) is explicitly Medium, since it's a reasoned hypothesis, not yet isolated by a dedicated query.
-
-**17. How does this project demonstrate business, not just technical, thinking?**
-Every recommendation answers "why now, what KPI, who owns it, what's the risk" — not just "here's an interesting number." The `07_Business_Recommendations.md` document exists specifically to translate findings into decisions a CEO could act on this quarter.
-
-**18. What's the most defensible number in this project?**
-Total Revenue ($362,165) — independently reconciled three separate ways (direct sum, weekly rollup, and cross-validation query) with an exact match, giving high confidence in the headline financial figure.
-
-**19. What surprised you most in this analysis?**
-That mobile modestly outperforms desktop on both revenue-per-session and cart abandonment, despite carrying only 40% of session volume — the opposite of the industry-default assumption I'd have applied without checking.
-
-**20. If this were a real company, what would you tell the CEO in one sentence?**
-Fix the homepage activation gap and the checkout payment step first — everything else in this report, including two proven high-value segments, is currently being under-leveraged because too few visitors ever get far enough into the funnel to reach them.
-
----
-
-## 10. Project Deliverables
+## 9. Project Deliverables
 
 | Document | Purpose |
 |---|---|
@@ -223,24 +159,24 @@ Fix the homepage activation gap and the checkout payment step first — everythi
 | `03_Data_Validation.md` | Executes and scores 23 data-quality checks (PASS/WARNING/FAIL), establishing the evidence base for every methodology rule. |
 | `04_Metrics_Framework.md` | Defines 26 metrics across 10 categories, each with formula, grain, and common-mistake guidance, built on the validation findings. |
 | `05_SQL_Query_Repository.md` | 54 production SQL queries implementing every metric, executed and cross-checked against real output, discovering rules R6 and R7 along the way. |
-| `06_Analysis.md` | The full executive analysis — 18 sections connecting every finding into one business narrative, with root causes, confidence levels, and cross-functional implications. |
+| `06_Analysis.md` | The full executive analysis 18 sections connecting every finding into one business narrative, with root causes, confidence levels, and cross-functional implications. |
 | `07_Business_Recommendations.md` | Converts findings into 13 prioritized, owned, KPI-linked recommendations with a full quarterly roadmap and ROI/effort classification. |
-| `08_Executive_Summary.md` | This document — a board-ready briefing and interview/portfolio reference. |
-| `09_Analytics_Decision_Log.md` | *(Next deliverable)* — a durable record of every assumption, validation result, and methodology decision made across the engagement, for future analysts inheriting this dataset. |
+| `08_Executive_Summary.md` | This document a board-ready briefing and interview/portfolio reference. |
+| `09_Analytics_Decision_Log.md` | *(Next deliverable)* a durable record of every assumption, validation result, and methodology decision made across the engagement, for future analysts inheriting this dataset. |
 
 ---
 
-## 11. Final Conclusion
+## 10. Final Conclusion
 
 This engagement set out to determine whether a real business story could be extracted from a public GA4 sample dataset, using the same rigor a Product Analytics team at a top technology company would apply to a live production decision. It succeeded on both counts: a coherent, evidence-based business narrative emerged, and the process of finding it surfaced genuine data-quality issues that would have compromised a less careful analysis.
 
-**Business outcome:** The Google Merchandise Store is an operationally healthy but strategically under-leveraged business. Its core constraint is not acquisition volume or checkout mechanics — both function adequately — but activation (only 19.97% of new visitors ever view a product) and retention (a near-total absence of return visits, consistent with a low-frequency-purchase category rather than a fixable defect). The clearest near-term opportunity is not more traffic, but better conversion of the traffic already arriving, and deliberate investment in the two segments — past purchasers and the top value tier — already proven to outperform the blended average by 2–3x.
+**Business outcome:** The Google Merchandise Store is an operationally healthy but strategically under-leveraged business. Its core constraint is not acquisition volume or checkout mechanics both function adequately but activation (only 19.97% of new visitors ever view a product) and retention (a near-total absence of return visits, consistent with a low-frequency-purchase category rather than a fixable defect). The clearest near-term opportunity is not more traffic, but better conversion of the traffic already arriving, and deliberate investment in the two segments past purchasers and the top value tier already proven to outperform the blended average by 2-3x.
 
 **Analytics maturity demonstrated:** This engagement did not stop at "here are the numbers." Every stage built on and stress-tested the one before it: data validation exposed real defects before any metric was trusted; the metrics framework encoded those defects as enforceable rules rather than footnotes; the SQL repository tested those rules against real query output and discovered two *additional* defects (R6, R7) that hadn't been visible during validation alone; the executive analysis synthesized findings into a single causal narrative rather than a list of disconnected charts; and the recommendations report translated that narrative into owned, sequenced, risk-assessed decisions. This is the difference between reporting metrics and building an analytics function's institutional judgment.
 
 **Key lessons:**
-- **Grain discipline is not optional.** The single most common error opportunity in this dataset — event vs. session vs. user grain — was directly responsible for at least two major findings in this engagement (the cart-to-checkout naive-ratio gap, the view-to-purchase divergence). Every non-trivial query in this project states its grain explicitly for exactly this reason.
-- **An anomaly is a question, not a footnote.** The Dec 28 engagement-rate jump and the `item_id` join failure could both have been reported as-is with a passing caveat. Instead, each was diagnosed to a specific, evidenced root cause (R6, R7) before being trusted — this is what separates a validated finding from a plausible-looking one.
-- **The most valuable finding is sometimes the one that isn't actionable yet.** The `(data deleted)` segment is this engagement's best-performing discovery and its most honestly-caveated one — flagged as high-potential and Legal-gated, not oversold as a guaranteed win.
+- **Grain discipline is not optional.** The single most common error opportunity in this dataset event vs. session vs. user grain was directly responsible for at least two major findings in this engagement (the cart-to-checkout naive-ratio gap, the view-to-purchase divergence). Every non-trivial query in this project states its grain explicitly for exactly this reason.
+- **An anomaly is a question, not a footnote.** The Dec 28 engagement-rate jump and the `item_id` join failure could both have been reported as-is with a passing caveat. Instead, each was diagnosed to a specific, evidenced root cause (R6, R7) before being trusted this is what separates a validated finding from a plausible-looking one.
+- **The most valuable finding is sometimes the one that isn't actionable yet.** The `(data deleted)` segment is this engagement's best-performing discovery and its most honestly-caveated one flagged as high-potential and Legal-gated, not oversold as a guaranteed win.
 
-**Why this demonstrates real Product Analytics capability:** This project treats SQL as a means, not the deliverable — the actual output is a defensible business narrative, a prioritized set of decisions, and a documented, reusable methodology that a real team could hand to a new analyst on day one. That combination — technical rigor, business judgment, and honest handling of uncertainty — is what separates a portfolio piece built to demonstrate SQL fluency from one built to demonstrate Product Analytics judgment.
+**Why this demonstrates real Product Analytics capability:** This project treats SQL as a means, not the deliverable the actual output is a defensible business narrative, a prioritized set of decisions, and a documented, reusable methodology that a real team could hand to a new analyst on day one. That combination technical rigor, business judgment, and honest handling of uncertainty is what separates a portfolio piece built to demonstrate SQL fluency from one built to demonstrate Product Analytics judgment.
