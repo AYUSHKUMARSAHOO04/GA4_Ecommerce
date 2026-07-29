@@ -77,7 +77,7 @@ WEB = 100.0% of 4,295,584 events.
 | mobile | 39.67% |
 | tablet | 2.17% |
 
-No null/unknown category rows. **Also a useful early finding: this store skews **desktop-majority**, contrary to the "mobile-first ecommerce" assumption many analysts default to. Worth carrying into Stage 6 Device Analysis and Stage 7 Recommendations.
+No null/unknown category rows. Also a useful early finding: this store skews **desktop-majority**, contrary to the "mobile-first ecommerce" assumption many analysts default to. Worth carrying into Stage 6 Device Analysis and Stage 7 Recommendations.
 
 ---
 
