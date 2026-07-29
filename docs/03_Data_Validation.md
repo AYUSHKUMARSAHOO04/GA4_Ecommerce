@@ -88,7 +88,7 @@ No null/unknown category rows. Also a useful early finding: this store skews **d
 |---|---|---|
 | 5,692 | 0 | 23 (0.40%) |
 
-**Revenue itself is fully populated (great), but 23 purchases (0.40%) lack a transaction_id, which will need explicit handling wherever transaction-level joins are used (see §4.2).
+Revenue itself is fully populated (great), but 23 purchases (0.40%) lack a transaction_id, which will need explicit handling wherever transaction-level joins are used (see §4.2).
 
 ### 4.2 transaction_id Uniqueness
 Two distinct problems surfaced, both more serious than a simple double-fire:
