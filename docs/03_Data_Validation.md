@@ -149,7 +149,7 @@ The strongest result in the entire suite. Session-grain and path-grain analysis 
 ### 5.3 ecommerce Completeness
 `has_purchase_revenue` is non-zero **only** on `purchase` events (5,692), zero everywhere else.
 
-**No schema misuse; ecommerce struct is correctly scoped.
+No schema misuse; ecommerce struct is correctly scoped.
 
 ---
 
