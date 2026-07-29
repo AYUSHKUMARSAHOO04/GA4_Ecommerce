@@ -47,7 +47,7 @@ This store converts visitors and generates revenue, but it does not build custom
 
 **Traffic quality anomaly requiring disclosure, not exclusion:** 85.74% of all events, and 99.7%+ of all sessions, carry `debug_mode = 1` [§6.4 Data Validation, Q2.8]. Query 2.8 confirmed this saturation is essentially uniform across every channel (99.7–99.97%), meaning **relative channel comparisons in this report are not distorted by this issue**, even though absolute volumes should be read as directional, per **R1**.
 
-**Growth efficiency** [Q1.2]: Weekly Transacting Users per 100 sessions peaked at 1.84 (week of Dec 7) and fell to a low of 0.38 (week of Jan 25) a **nearly 5x swing in acquisition efficiency** across the window, moving inversely with the seasonal traffic curve. This confirms that the Nov–Dec traffic surge was not merely bigger, it was *more efficient* traffic a distinction that matters for whether post-holiday spend should chase volume or quality.
+**Growth efficiency** [Q1.2]: Weekly Transacting Users per 100 sessions peaked at 1.84 (week of Dec 7) and fell to a low of 0.38 (week of Jan 25) a **nearly 5x swing in acquisition efficiency** across the window, moving inversely with the seasonal traffic curve. This confirms that the Nov-Dec traffic surge was not merely bigger, it was *more efficient* traffic a distinction that matters for whether post-holiday spend should chase volume or quality.
 
 **Key SQL references:** Q1.1, Q1.2, Q2.1–Q2.10.
 
