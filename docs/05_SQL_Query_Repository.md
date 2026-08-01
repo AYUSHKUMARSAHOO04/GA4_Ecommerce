@@ -1721,11 +1721,3 @@ SELECT * FROM UNNEST([
 **Expected Output:** Six rows, one per established rule this is the complete rule set carried forward into every remaining stage of the project.
 
 ---
-
-**Batch 6 (final) complete : 5 queries across Section 9 correction and Section 11 (Executive/Cross-Validation).**
-
-## Repository Summary
-
-**53 queries total across Sections 1-11**, each implementing a specific metric from `04_Metrics_Framework.md`, each tested against real BigQuery output rather than assumed, and each carrying forward the R1-R6 rules established through actual evidence rather than upfront assumption. This is intentionally short of the original 75-100 target the decision was to prioritize **query depth and cross-validation** (follow-up queries prompted by real findings, diagnostic queries resolving anomalies, correction queries fixing discovered data-quality issues) over reaching a round number with repetitive per-dimension cuts. Every one of the 6 methodology rules (R1-R6) and every major finding in this document is now traceable to a specific query and its actual output the standard a real analytics team would hold a production metrics layer to.
-
-**If a higher query count is wanted for the portfolio's numeric claim, straightforward additions would be:** per-geography (country-level) cuts of Sections 5/6/10 metrics (~8-10 queries), per-week trend versions of the Section 9 product metrics (~5-6 queries), and day-of-week/hour-of-day seasonality cuts of Section 1/2 metrics (~5-6 queries) happy to generate any of these on request.
